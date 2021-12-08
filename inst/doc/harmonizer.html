@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Christoph Baumgartner" />
+<meta name="author" content="Janette Walde" />
+
+
+<title>Harmonizing Product Codes with R</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  p.abstract{
+    text-align: center;
+    font-weight: bold;
+  }
+  div.abstract{
+    margin: auto;
+    width: 90%;
+  }
+</style>
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Harmonizing Product Codes with R</h1>
+<h4 class="author">Christoph Baumgartner<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></h4>
+<h4 class="author">Janette Walde<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></h4>
+<div class="abstract">
+<p class="abstract">Abstract</p>
+Innovation is a major engine of economic growth. To compare products over time, harmonization of product codes is mandatory. This package provides an <em>easy-to-use</em> approach to harmonize product codes. Moreover, it offers an application that allows finding all new and dropped products for given firm-level data based on harmonized product codes.
+</div>
+
+
+
+<style type="text/css">
+
+h1.title {
+  font-size: 38px;
+  color: Black;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: Black;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+  text-align: center;
+}
+</style>
+<p>This package provides several functions to harmonize <em>CN8</em> product codes as well as <em>PC8</em> product codes. All functions are listed below:</p>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<ul>
+<li><a href="#idmainfunctions">Main Functions</a>
+<ul>
+<li><a href="#idharmonize.cn8">harmonize.cn8()</a></li>
+<li><a href="#idharmonize.pc8">harmonize.pc8()</a></li>
+</ul></li>
+<li><a href="#idsupportfunctions">Support Functions</a>
+<ul>
+<li><a href="#idhistory.cn8">history.cn8()</a></li>
+<li><a href="#idhistory.pc8">history.pc8()</a></li>
+<li><a href="#idcn8.to.bec">cn8.to.bec()</a></li>
+<li><a href="#idpc8.to.bec">pc8.to.bec()</a></li>
+<li><a href="#idget.data.directory">get.data.directory()</a></li>
+</ul></li>
+<li><a href="#idadditionalfunctions">Additional Functions</a>
+<ul>
+<li><a href="#idutilize.cn8">utilize.cn8()</a></li>
+<li><a href="#idutilize.pc8">utilize.pc8()</a></li>
+</ul></li>
+<li><a href="#iddatasets">Data Sets</a>
+<ul>
+<li><a href="#idCN8data">CN8 data</a></li>
+<li><a href="#idPC8data">PC8 data</a></li>
+<li><a href="#idHS6data">HS6 data</a></li>
+<li><a href="#idBECdata">BEC data</a></li>
+</ul></li>
+<li><a href="#idcustomdata">Custom Data</a></li>
+</ul>
+<p><a id="idmainfunctions"></a></p>
+</div>
+<div id="main-functions" class="section level2">
+<h2>Main Functions</h2>
+<p><a id="idharmonize.cn8"></a></p>
+<pre><code>harmonize.cn8() </code></pre>
+<p>provides for a given time period a data frame that contains all <em>CN8</em> product codes and their history, harmonized <em>CN8plus</em> codes, harmonized <em>HS6plus</em> codes, and <em>BEC</em> classification. The “plus-codes” are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last year of interest. The following table offers an overview of all provided variables.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">CN8_xxxx</td>
+<td align="left">a specific CN8 code in a given year</td>
+</tr>
+<tr class="even">
+<td align="left">CN8plus</td>
+<td align="left">the harmonization code for CN8, which refers to the last year of the time period</td>
+</tr>
+<tr class="odd">
+<td align="left">HS6plus</td>
+<td align="left">the harmonization code of HS6, which refers to the last year of the time period</td>
+</tr>
+<tr class="even">
+<td align="left">BEC</td>
+<td align="left">provides the BEC classification at a high aggregation level (1 digit)</td>
+</tr>
+<tr class="odd">
+<td align="left">BEC_agr</td>
+<td align="left">provides the BEC classification at a lower aggregation level (up to 3 digits)</td>
+</tr>
+<tr class="even">
+<td align="left">BEC_basic_class</td>
+<td align="left">provides information if the code is classified as consumption, capital or intermediate good in BEC</td>
+</tr>
+<tr class="odd">
+<td align="left">flag</td>
+<td align="left">either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition</td>
+</tr>
+<tr class="even">
+<td align="left">flagyear</td>
+<td align="left">indicates the first year in which the flag was set to 1</td>
+</tr>
+</tbody>
+</table>
+<p>For more application details, see <em>?harmonization.cn8</em>.</p>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p><a id="idharmonize.pc8"></a></p>
+<pre><code>harmonize.pc8() </code></pre>
+<p>provides for a given time period a data frame that contains all <em>PC8</em> product codes and their history, harmonized <em>PC8plus</em> codes, harmonized <em>HS6plus</em> codes, and <em>BEC</em> classification. The “plus-codes” are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last year of interest. The following table offers an overview of all provided variables.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">PC8_xxxx</td>
+<td align="left">a specific PC8 code in a given year</td>
+</tr>
+<tr class="even">
+<td align="left">PC8plus</td>
+<td align="left">the harmonization code for PC8, which refers to the last year of the time period</td>
+</tr>
+<tr class="odd">
+<td align="left">HS6plus</td>
+<td align="left">the harmonization code of HS6, which refers to the last year of the time period</td>
+</tr>
+<tr class="even">
+<td align="left">BEC</td>
+<td align="left">provides the BEC classification at a high aggregation level (1 digit)</td>
+</tr>
+<tr class="odd">
+<td align="left">BEC_agr</td>
+<td align="left">provides the BEC classification at a lower aggregation level (up to 3 digits)</td>
+</tr>
+<tr class="even">
+<td align="left">BEC_basic_class</td>
+<td align="left">provides information if the code is classified as consumption, capital or intermediate good in BEC</td>
+</tr>
+<tr class="odd">
+<td align="left">flag</td>
+<td align="left">either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition</td>
+</tr>
+<tr class="even">
+<td align="left">flagyear</td>
+<td align="left">indicates the first year in which the flag was set to 1</td>
+</tr>
+</tbody>
+</table>
+<p>For more application details, see <em>?harmonization.pc8</em>.</p>
+<p><a id="idsupportfunctions"></a></p>
+</div>
+<div id="support-functions" class="section level2">
+<h2>Support Functions</h2>
+<p>All support functions are used within the main functions. They provide intermediate steps to harmonize the data. However, they can be used as stand-alone functions as well.</p>
+<p><a id="idhistory.cn8"></a></p>
+<pre><code>history.cn8() </code></pre>
+<p>provides a data frame that contains all <em>CN8</em> product codes and their history over time for the demanded time period. This dataset is the basis for the main function <code>harmonize.cn8()</code> and can be obtained therewith as well. The following table offers an overview of all provided variables.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">CN8_xxxx</td>
+<td align="left">a specific CN8 code in a given year</td>
+</tr>
+<tr class="even">
+<td align="left">flag</td>
+<td align="left">either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition</td>
+</tr>
+<tr class="odd">
+<td align="left">flagyear</td>
+<td align="left">indicates the first year in which the flag was set to 1</td>
+</tr>
+</tbody>
+</table>
+<p>For more application details, see <em>?history.cn8</em>.</p>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p><a id="idhistory.pc8"></a></p>
+<pre><code>history.pc8() </code></pre>
+<p>provides a data frame that contains all <em>PC8</em> product codes and their history over time for the demanded time period. This dataset is the basis for the main function <code>harmonize.PC8()</code> and can be obtained therewith as well. The following table offers an overview of all provided variables.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">PC8_xxxx</td>
+<td align="left">a specific PC8 code in a given year</td>
+</tr>
+<tr class="even">
+<td align="left">flag</td>
+<td align="left">either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition</td>
+</tr>
+<tr class="odd">
+<td align="left">flagyear</td>
+<td align="left">indicates the first year in which the flag was set to 1</td>
+</tr>
+</tbody>
+</table>
+<p>For more application details, see <em>?history.pc8</em>.</p>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p><a id="idcn8.to.bec"></a></p>
+<pre><code>cn8.to.bec() </code></pre>
+<p>provides a data frame that contains all <em>CN8</em> product codes and related <em>BEC</em> and <em>HS6</em> codes in a given time period. Therefore, this data serves as a connection between <em>CN8</em> and <em>BEC</em> classification and between <em>CN8</em> and <em>HS6</em> classification. It forms the basis of some output of the main function, namely: <em>BEC</em>, <em>BEC_agr</em>, <em>BEC_basic_class</em> and <em>HS6plus</em>. The following table offers an overview of all provided variables.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">CN8</td>
+<td align="left">a specific CN8 code</td>
+</tr>
+<tr class="even">
+<td align="left">HS6</td>
+<td align="left">provides the HS6 classification of the CN8plus code</td>
+</tr>
+<tr class="odd">
+<td align="left">BEC</td>
+<td align="left">provides the BEC classification on a high aggregation level (1 digit)</td>
+</tr>
+<tr class="even">
+<td align="left">BEC_agr</td>
+<td align="left">provides the BEC classification on a lower aggregation level (up to 3 digits)</td>
+</tr>
+</tbody>
+</table>
+<p>For more application details, see <em>?cn8.to.bec</em>.</p>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p><a id="idpc8.to.bec"></a></p>
+<pre><code>pc8.to.bec() </code></pre>
+<p>provides a data frame that contains all <em>PC8</em> product codes and related <em>BEC</em> and <em>HS6</em> codes in a given time period. Therefore, this data serves as a connection between <em>PC8</em> and <em>BEC</em> classification and between <em>PC8</em> and <em>HS6</em> classification. It forms the basis of some output of the main function, namely: <em>BEC</em>, <em>BEC_agr</em>, <em>BEC_basic_class</em> and <em>HS6plus</em>. The following table offers an overview of all provided variables.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">PC8_xxxx</td>
+<td align="left">a specific PC8 code</td>
+</tr>
+<tr class="even">
+<td align="left">HS6</td>
+<td align="left">provides the HS6 classification of the PC8plus code</td>
+</tr>
+<tr class="odd">
+<td align="left">BEC</td>
+<td align="left">provides the BEC classification on a high aggregation level (1 digit)</td>
+</tr>
+<tr class="even">
+<td align="left">BEC_agr</td>
+<td align="left">provides the BEC classification on a lower aggregation level (up to 3 digits)</td>
+</tr>
+</tbody>
+</table>
+<p>For more application details see <em>?pc8.to.bec</em>.</p>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p><a id="idget.data.directory"></a></p>
+<pre><code>get.data.directory() </code></pre>
+<p>provides the directory where custom data must be stored and the used data (e.g., concordance lists, list of codes) can be edited. However, before editing the employed data or using additional concordance lists for example, it is highly recommended to read first the instructions in this vignette carefully (also see section <a href="#iddatasets">Data Sets</a> and <a href="#idcustomdata">Custom Data</a>). The directory is provided in the R console. Further features (like open an explorer, print available data in console) are only executable if the directory path does not contain any blanks.</p>
+<p>For more application details see <em>?get.data.directory</em>.</p>
+<p><a id="idadditionalfunctions"></a></p>
+</div>
+<div id="additional-functions" class="section level2">
+<h2>Additional Functions</h2>
+<p>These functions go beyond the primary purpose of this package. The additional functions provide an application of the data frames obtained by the main functions. To use these additional functions, data on firm-level is required, which is data that is not provided by the package. The firm-level data must provide columns with the following names: <em>ID</em>, <em>year</em> and <em>CN8</em> or <em>PC8</em>. Other columns may exist; however, they will not be used by the function. The following table summarizes the variables that need to be included in the firm-level data.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ID</td>
+<td align="left">specific code that describes a firm over the years (this code does not change over time)</td>
+</tr>
+<tr class="even">
+<td align="left">year</td>
+<td align="left">year in which the firm produced a product</td>
+</tr>
+<tr class="odd">
+<td align="left">CN8</td>
+<td align="left">CN8 code of firm product</td>
+</tr>
+<tr class="even">
+<td align="left">PC8</td>
+<td align="left">PC8 code of firm product</td>
+</tr>
+</tbody>
+</table>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p><a id="idutilize.cn8"></a></p>
+<pre><code>  utilize.cn8() </code></pre>
+may provide two data frames:
+<ol type="a">
+<li>
+A data frame that contains all changed <em>CN8</em> product codes per firm per year. In more detail, this means how many products remained the same, were added, were dropped, how many products were produced by a certain firm in a given year, and how many products were produced in the year after.
+</li>
+<li>
+A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is <em>CN8plus</em>, <em>flag</em>, <em>flagyear</em>, <em>HS6plus</em>, <em>BEC</em>, <em>BEC_agr</em>, <em>BEC_basic_class</em>).
+</li>
+</ol>
+<p>The tables at the end of this section offer an overview of all provided variables.</p>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p><a id="idutilize.pc8"></a></p>
+<pre><code>  utilize.pc8() </code></pre>
+may provide two data frames:
+<ol type="a">
+<li>
+A data frame that contains all changed <em>PC8</em> product codes per firm per year. In more detail, this means how many products remained the same, were added, were dropped, how many products were produced by a certain firm in a given year, and how many products were produced in the year after.
+</li>
+<li>
+A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is <em>PC8plus</em>, <em>flag</em>, <em>flagyear</em>, <em>HS6plus</em>, <em>BEC</em>, <em>BEC_agr</em>, <em>BEC_basic_class</em>).
+</li>
+</ol>
+<p>The tables at the end of this section offer an overview of all provided variables.</p>
+<hr style="border:2px solid rgb(246,246,246)">
+</hr>
+<p>Since the provided data frames do not differ between <code>utilize.cn8()</code> and <code>utilize.pc8()</code>, in terms of notation, the tables are only provided once here.</p>
+<p><em>Table that summarizes the output, described by the notation</em> <strong>a.</strong> <em>above:</em></p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">firmID</td>
+<td align="left">specific code that describes a firm over the years (this code does not change over time)</td>
+</tr>
+<tr class="even">
+<td align="left">period_UL</td>
+<td align="left">lower limit of the time period</td>
+</tr>
+<tr class="odd">
+<td align="left">period</td>
+<td align="left">time period in which the product was produced</td>
+</tr>
+<tr class="even">
+<td align="left">gap</td>
+<td align="left">indicating if the time period is greater than one (i.e. upper limit - lower limit &gt; 1)</td>
+</tr>
+<tr class="odd">
+<td align="left">same_products</td>
+<td align="left">number of products that were produced in both years (i.e. remained in the product portfolio of this firm)</td>
+</tr>
+<tr class="even">
+<td align="left">new_products</td>
+<td align="left">number of added products in the upper limit of the time period (i.e. added to the product portfolio of this firm)</td>
+</tr>
+<tr class="odd">
+<td align="left">dropped_products</td>
+<td align="left">number of dropped products in the upper limit of the time period (i.e. removed of the product portfolio of this firm)</td>
+</tr>
+<tr class="even">
+<td align="left">nbr_of_products_period_LL</td>
+<td align="left">number of all products produced in the lower limit of the time period (i.e. entire product portfolio of this firm)</td>
+</tr>
+<tr class="odd">
+<td align="left">nbr_of_products_period_UL</td>
+<td align="left">number of all products produced in the upper limit of the time period (i.e. entire product portfolio of this firm)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Table that summarizes the output, described by the notation</em> <strong>b.</strong> <em>above:</em></p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">firmID</td>
+<td align="left">specific code that describes a firm over the years (this code does not change over time, provided by user)</td>
+</tr>
+<tr class="even">
+<td align="left">year</td>
+<td align="left">year in which the firm produced a product (provided by user)</td>
+</tr>
+<tr class="odd">
+<td align="left">CN8</td>
+<td align="left">CN8 code of firm product (provided by user)</td>
+</tr>
+<tr class="even">
+<td align="left">PC8</td>
+<td align="left">PC8 code of firm product (provided by user)</td>
+</tr>
+<tr class="odd">
+<td align="left">…</td>
+<td align="left">additional columns from original firm data (provided by user)</td>
+</tr>
+<tr class="even">
+<td align="left">CN8plus</td>
+<td align="left">final harmonization, which refers to the last year of the time period</td>
+</tr>
+<tr class="odd">
+<td align="left">PC8plus</td>
+<td align="left">final harmonization, which refers to the last year of the time period</td>
+</tr>
+<tr class="even">
+<td align="left">flag</td>
+<td align="left">either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition</td>
+</tr>
+<tr class="odd">
+<td align="left">HS6</td>
+<td align="left">provides the HS6 classification of the PC8plus / CN8plus code</td>
+</tr>
+<tr class="even">
+<td align="left">HS6plus</td>
+<td align="left">also adjusts for the change lists of HS6</td>
+</tr>
+<tr class="odd">
+<td align="left">BEC</td>
+<td align="left">provides the BEC classification on a high aggregated level (1 digit)</td>
+</tr>
+<tr class="even">
+<td align="left">BEC_agr</td>
+<td align="left">provides the BEC classification on a less aggregated level (up to 3 digits)</td>
+</tr>
+<tr class="odd">
+<td align="left">BEC_basic_class</td>
+<td align="left">provides information if the code is classified as consumption, capital or intermediate good in BEC</td>
+</tr>
+</tbody>
+</table>
+<p><a id="iddatasets"></a></p>
+</div>
+<div id="data-sets" class="section level2">
+<h2>Data Sets</h2>
+<p>By default, the package provides several data sets for CN8-, PC8-, HS6- and BEC-classification. This data allows for harmonization of CN8 product codes between 1995 and 2022 and PC8 product codes between 2007 and 2017. All available data sets are stored within the package. The function <code>get.data.directory()</code> provides support to access the data more easily. All data included in the package was downloaded from <a href="https://ec.europa.eu/eurostat/ramon/">EU server Ramon</a> originally and altered if needed.</p>
+<p>Provided data in more detail:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>CN8 data</strong> <a id="idCN8data"></a> is provided in the corresponding CN8 folder. This folder contains two different types of files. Firstly, a list of all existing CN8 codes for every year, e.g. for the year 2000, <em>CN8_2000.rds</em>. More technically speaking, these files provided a data frame with one column and <em>n</em> rows, where <em>n</em> is the number of existing CN8 codes in a given year. An example (first six lines) of the year 2000 is the following:</p>
+<pre><code>     group
+1 01011100
+2 01011910
+3 01011990
+4 01012010
+5 01012090
+6 01021010</code></pre>
+<p>Secondly, the CN8 folder contains a concordance list of all CN8 codes over time, a <em>.csv</em> file, where the separator is a semicolon, i.e. “<em>;</em>”. A header is necessary. The header names must be the following: <em>from</em>, <em>to</em>, <em>obsolete</em>, <em>new</em>. The period between “from” and “to” is always one year and describes when the code changed. The “obsolete” and “new” codes represent the outdated code and the replacement, respectively. The first six lines of the default csv-file look like the following:</p>
+<pre><code>from;to;obsolete;new
+1988;1989;02012011;02012021
+1988;1989;02012011;02012029
+1988;1989;02012019;02012029
+1988;1989;03036010;03036011
+1988;1989;03036010;03036019</code></pre></li>
+<li><p><strong>PC8 data</strong> <a id="idPC8data"></a> is provided in the corresponding PC8 folder. This folder contains two different types of files. Firstly, a list of all existing PC8 codes for every year, e.g. for the year 2010, <em>PC8_2010.rds</em>. More technically speaking, these files provided a data frame with one column and <em>n</em> rows, where <em>n</em> is the number of existing CN8 codes in a given year. An example (first six lines) of the year 2010 is the following:</p>
+<pre><code>      2010
+1 07101000
+2 07291100
+3 07291200
+4 07291300
+5 07291400
+6 07291500</code></pre>
+<p>Secondly, a concordance between every year is necessary. These files contain two years in their filenames, with a period of one year in between, e.g. between 2010 and 2011 this results in <em>PC8_2010_2011.rds</em>. More technically speaking, these files are data frames with two columns, which must be named “new” and “old” and <em>n</em> rows, where <em>n</em> is the number of changes in a given year. An example (first six lines) of the changes between 2010 and 2011 is the following:</p>
+<pre><code>       new      old
+1 07101000 07101000
+2 07291100 07291100
+3 07291200 07291200
+4 07291300 07291300
+5 07291400 07291400
+6 07291500 07291500</code></pre>
+<p>Thirdly, the PC8 folder contains concordance lists between PC8- and CN8- classifications for every year. This data is needed in terms of translating PC8 into BEC. An example for the year 2010 would be <em>PC8_CN8_2010.rds</em>. Technically this means, a data frame with two columns, named “PRCCODE” for PC8 codes and “CNCODE” for CN8 codes and <em>n</em> rows, where <em>n</em> is the number of concordances between specific codes is provided by every year. However, no concordance between PC8 and CN8 may be possible. In this case, the missing value is filled by <em>NA</em>. Some examples out of the associated file for the year 2010 can be found below:</p>
+<pre><code>   PRCCODE CNCODE
+1 10131430   &lt;NA&gt;
+2 10139100   &lt;NA&gt;
+3 10399100   &lt;NA&gt;
+4 13301110   &lt;NA&gt;
+5 13301121   &lt;NA&gt;
+6 13301122   &lt;NA&gt;
+     PRCCODE   CNCODE
+2400 8111136 25151200
+2401 8111150 25152000
+2402 8111233 25161100
+2403 8111236 25161200
+2404 8111250 25162000
+2405 8111290 25169000</code></pre></li>
+<li><p><strong>HS6 data</strong> <a id="idHS6data"></a> is provided in the corresponding HS6 folder. This folder only contains one type of file, which are correspondence lists between the changes of HS6 codes over time. Those changes happened in several years: 1992, 1996, 2002, 2007, 2012 and 2017. For every period, a separate concordance list is necessary. csv-files provided this data, where the separator is a semicolon, i.e. “<em>;</em>” and the filenames contain both years. For example, between 1996 and 2002, the file is called <em>HS_1996_to_HS_1992.csv</em>. Also, headers are included in this file. For this specific case, they are “HS 1996” and “HS 1992”. For other periods the headers change accordingly. An example (first six lines) of the changes between 1996 and 1992 is the following:</p>
+<pre><code>&lt;U+FEFF&gt;HS 1996;HS 1992
+10111;10111
+10119;10119
+10120;10120
+10210;10210
+10290;10290</code></pre></li>
+<li><p><strong>BEC data</strong> <a id="idBECdata"></a> data is provided in the HS6toBEC folder. This folder contains only one type of file, which are correspondence lists between HS6- and BEC-classification in the years HS6 codes changed (i.e. 2002, 2007, 2012, 2017). For each year, a separate concordance list is necessary. csv-files are used for this data, where the separator is a semicolon, i.e. “<em>;</em>” and the filenames contain the year. For example, in 2002, the file is called <em>HS2002toBEC.csv</em>. Also, headers are included in this file, namely “HS” for the HS6 codes and “BEC” for the BEC codes. An example (first six lines) of the concordance in 2002 is the following:</p>
+<pre><code>HS;BEC
+10110;41
+10190;111
+10210;41
+10290;111
+10310;41</code></pre></li>
+</ol>
+<div id="custom-data" class="section level3">
+<h3>Custom Data <a id="idcustomdata"></a></h3>
+<p>The use of additional concordance lists for example or altering provided data is possible. However, it is highly recommended to read first the instructions in this vignette carefully. If new data is added, there are some mandatory aspects and some valuable aspects to acknowledge.</p>
+<p>Mandatory aspects:</p>
+<ul>
+<li><p>New data must be stored inside the package. This can be easily done by adding new files in the appropriate subfolder of the package database. <code>get.data.directory()</code> may provide help to find the correct folder to store new data.</p></li>
+<li><p>Chosen filenames must be analogue to already existing files.</p></li>
+<li><p>The structure of the new data is crucial. The section <a href="#iddatasets">Data Sets</a> may provide more details. In short: file-type, header names, column numbers and datatype (numeric, character, …) are very important.</p></li>
+</ul>
+<p>Valuable aspects:</p>
+<ul>
+<li>It is highly recommended to download new data from <a href="https://ec.europa.eu/eurostat/ramon/">EU server Ramon</a> and only alter content-related data if necessary.</li>
+<li>Product codes need to have the correct length, e.g. CN8 codes must be eight digits long. Some programs tend to interpret codes as numeric values and cut of leading zeros, which leads to completely wrong results.</li>
+</ul>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Universität Innsbruck, <a href="mailto:Christoph.Baumgartner@uibk.ac.at" class="email">Christoph.Baumgartner@uibk.ac.at</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Universität Innsbruck, <a href="mailto:Janette.Walde@uibk.ac.at" class="email">Janette.Walde@uibk.ac.at</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
