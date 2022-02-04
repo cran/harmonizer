@@ -1,8 +1,8 @@
-\name{harmonize.pc8}
-\alias{harmonize.pc8}
+\name{harmonize_pc8}
+\alias{harmonize_pc8}
 \title{Harmonization of PC8 product codes}
 \usage{
-harmonize.pc8(b, e, historymatrix = NULL,
+harmonize_pc8(b, e, historymatrix = NULL,
               HS6breaks = c(1992, 1996, 2002, 2007, 2012, 2017),
               progress = TRUE)
 }
@@ -12,7 +12,7 @@ Provides a dataframe which contains all PC8 product codes and their history in t
 \arguments{
 \item{b}{first year of interest}
 \item{e}{last year of interest}
-\item{historymatrix}{History matrix of PC8 product codes. Provided by history.martix.pc8(). By default \emph{NULL}; the function computes the needed harmonized data.}
+\item{historymatrix}{History matrix of PC8 product codes. Provided by history_matrix_pc8(). By default \emph{NULL}; the function computes the needed harmonized data.}
 \item{HS6breaks}{Vector of years, where HS6 codes where changed.}
 \item{progress}{logical, determines whether progress is printed in console or not.}
 }
@@ -35,10 +35,10 @@ Variable \tab	Explanation \cr
 
 \examples{
 \donttest{
-harmonize.pc8(b = 2009, e = 2011)
+harmonize_pc8(b = 2009, e = 2011)
 
-mydata <- history.matrix.pc8(b = 2015, e = 2017)
-myharmonization <- harmonize.pc8(b = 2015, e = 2017,
+mydata <- history_matrix_pc8(b = 2015, e = 2017)
+myharmonization <- harmonize_pc8(b = 2015, e = 2017,
                                  historymatrix = mydata)
 }
 }

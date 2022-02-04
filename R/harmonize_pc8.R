@@ -6,9 +6,9 @@
 
 #' @importFrom stats na.omit setNames
 #' @importFrom utils read.csv
-#' @export harmonize.pc8
+#' @export harmonize_pc8
 
-harmonize.pc8 <- function(b, e, historymatrix = NULL,
+harmonize_pc8 <- function(b, e, historymatrix = NULL,
                           HS6breaks = c(1992, 1996, 2002, 2007, 2012, 2017),
                           progress = TRUE) {
 
@@ -37,7 +37,7 @@ harmonize.pc8 <- function(b, e, historymatrix = NULL,
   fcalls <- sys.nframe()
 
   if (is.null(historymatrix)) {
-    PC8_over_time <- history.matrix.pc8(b = b, e = e, progress = progress)
+    PC8_over_time <- history_matrix_pc8(b = b, e = e, progress = progress)
 
   } else {
     if (!is.data.frame(historymatrix)) {
@@ -103,7 +103,10 @@ harmonize.pc8 <- function(b, e, historymatrix = NULL,
     }
   }
 
-  PC8_to_BEC <- pc8.to.bec(b = b, e = e, historymatrix = PC8_over_time, progress = FALSE)
+  PC8_to_BEC <- pc8_to_bec(b = b, e = e, historymatrix = PC8_over_time, progress = FALSE)
+
+  years <- as.character(b:e)
+  nbr_years <- length(years)
 
   change_code <- rep("clear_code", nrow(PC8_over_time))
   new_code <- rep(0, nrow(PC8_over_time))
@@ -193,8 +196,20 @@ harmonize.pc8 <- function(b, e, historymatrix = NULL,
   PC8_over_time$HS6 <- as.character(PC8_over_time$HS6)
   PC8_over_time$HS6plus <- as.character(PC8_over_time$HS6)
   HS6_temp <- PC8_over_time[PC8_over_time$family == 1, ]
-  HS6_temp[, grep("PC8_", colnames(HS6_temp))] <- apply(HS6_temp[, grep("PC8_", colnames(HS6_temp))], 2,
-                                                        substr, start = 1, stop = 6)
+
+  # Find HS6 to PC8 and replace PC8 codes with HS6
+  for (i in 1:nbr_years){
+    # replace all NAs in PC8 codes with a "useless" string
+    # otherwise the apply function does not work properly
+    HS6_temp[, paste0("PC8_",years[i])][is.na(HS6_temp[, paste0("PC8_",years[i])])] <- "removed"
+    # find the corresponding HS6 codes
+    indexhs6 <- unlist(apply(as.matrix(HS6_temp[, paste0("PC8_",years[i])]), 1, grep, x = PC8_to_BEC$PC8))
+    # find which PC8 codes have a replacement
+    indexpc8 <- HS6_temp[, paste0("PC8_", years[i])] %in% PC8_to_BEC$PC8
+    # replace PC8 with HS6 if possible
+    HS6_temp[indexpc8, paste0("PC8_", years[i])] <- PC8_to_BEC$HS6[indexhs6]
+  }
+
   fams <- unique(HS6_temp$PC8plus)
 
   if (progress) {
@@ -311,17 +326,16 @@ harmonize.pc8 <- function(b, e, historymatrix = NULL,
     }
   } else {
     # case if no changes of HS6 happened in the observed time period
+    year_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))]
     for (i in 1:length(fams)) {
-      year_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))]
       block <- as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], year_names])
-      # check the code did not change across the years
+      # check the code whether it changes across the years?
       if (length(unique(unlist(block))) == 1) {
-        # if yes - rewritte HS6plus
-        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(eval(parse(text = "block")))),
-                                                             times = nrow(eval(parse(text = "block"))))
+        # if no change - rewrite HS6plus
+        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(block)), times = nrow(block))
       } else {
         # else keep the family
-        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i], times = nrow(eval(parse(text = "block"))))
+        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i], times = nrow(block))
       }
     }
   }

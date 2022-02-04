@@ -4,9 +4,9 @@
 ### Christoph Baumgartner & Janette Walde
 ###############################################################################
 
-#' @export get.data.directory
+#' @export get_data_directory
 
-get.data.directory <- function(path = TRUE, open.explorer = FALSE, show.data = NULL) {
+get_data_directory <- function(path = TRUE, open_explorer = FALSE, show_data = NULL) {
 
    # get path
    org_path <- system.file("extdata", package = "harmonizer")
@@ -20,23 +20,23 @@ get.data.directory <- function(path = TRUE, open.explorer = FALSE, show.data = N
    # open explorer
    if (sum(grep(" ", mod_path)) > 0) {
       stop("The path contains blanks, therefore no explorer can be opened. Please use the path provided in the console.")
-   } else if (open.explorer == TRUE) {
+   } else if (open_explorer == TRUE) {
       system2("open", mod_path)
    }
 
    # show available data
-   if (is.null(show.data)) {
-      show.data <- NULL
-   } else if (show.data == "CN8") {
+   if (is.null(show_data)) {
+      show_data <- NULL
+   } else if (show_data == "CN8") {
       list.files(paste0(org_path, "/CN8"))
-   } else if (show.data == "HS6") {
+   } else if (show_data == "HS6") {
       list.files(paste0(org_path, "/HS6"))
-   } else if (show.data == "PC8") {
+   } else if (show_data == "PC8") {
       list.files(paste0(org_path, "/PC8"))
-   } else if (show.data == "HS6toBEC") {
+   } else if (show_data == "HS6toBEC") {
       list.files(paste0(org_path, "/HS6toBEC"))
    } else {
-      stop("Unkown command for 'show.data'. Please use one of the following values:
+      stop("Unkown command for 'show_data'. Please use one of the following values:
            'CN8', 'HS6', 'PC8' or 'HS6toBEC'.")
    }
 

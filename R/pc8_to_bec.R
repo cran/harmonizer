@@ -6,9 +6,9 @@
 
 #' @importFrom stats na.omit setNames complete.cases
 #' @importFrom utils read.csv
-#' @export pc8.to.bec
+#' @export pc8_to_bec
 
-pc8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
+pc8_to_bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
   #########################
   ### input check
   #########################
@@ -33,7 +33,7 @@ pc8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
   #########################
   if (is.null(historymatrix)) {
     mod_part <- 3
-    PC8_over_time <- history.matrix.pc8(b = b, e = e, progress = progress)
+    PC8_over_time <- history_matrix_pc8(b = b, e = e, progress = progress)
   } else {
     if (!is.data.frame(historymatrix)) {
       stop("The entered history matrix is not a dataframe. Please correct.")
@@ -124,7 +124,7 @@ pc8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
     PC8 = unique_codes,
     HS6 = rep(NA, times = length(unique_codes)),
     BEC = rep(NA, times = length(unique_codes)),
-    BEC_arg = rep(NA, times = length(unique_codes))
+    BEC_agr = rep(NA, times = length(unique_codes))
   )
 
   if (progress) {
@@ -153,7 +153,7 @@ pc8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
         PC8 = rep(current_PC8, times = n_codes - 1),
         HS6 = substr(current_CN8[-1], start = 1, stop = 6),
         BEC = rep(NA, times = n_codes - 1),
-        BEC_arg = rep(NA, times = n_codes - 1)
+        BEC_agr = rep(NA, times = n_codes - 1)
       )
 
       multiple_codes <- rbind(multiple_codes, multiple_codes_temp)
@@ -177,7 +177,7 @@ pc8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
     }
   }
 
-  PC8_to_BEC$BEC_arg <- substr(PC8_to_BEC$BEC, start = 1, stop = 1)
+  PC8_to_BEC$BEC_agr <- substr(PC8_to_BEC$BEC, start = 1, stop = 1)
   rownames(PC8_to_BEC) <- NULL
 
   if (progress) {

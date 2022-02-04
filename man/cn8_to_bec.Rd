@@ -1,8 +1,8 @@
-\name{cn8.to.bec}
-\alias{cn8.to.bec}
+\name{cn8_to_bec}
+\alias{cn8_to_bec}
 \title{Concordance list between CN8 and BEC}
 \usage{
-cn8.to.bec(b, e, historymatrix = NULL, progress = TRUE)
+cn8_to_bec(b, e, historymatrix = NULL, progress = TRUE)
 }
 \description{
 Provides a dataframe which contains all CN8 product codes and related BEC codes in a given time period.
@@ -10,8 +10,8 @@ Provides a dataframe which contains all CN8 product codes and related BEC codes 
 \arguments{
 \item{b}{first year of interest}
 \item{e}{last year of interest}
-\item{historymatrix}{History matrix of CN8 product codes. Provided by history.martix.cn8().}
-\item{progress}{logical, determines wether progress is printed in console or not.}
+\item{historymatrix}{History matrix of CN8 product codes. Provided by history_matrix_cn8().}
+\item{progress}{logical, determines whether progress is printed in console or not.}
 }
 
 \value{
@@ -29,6 +29,6 @@ Variable \tab	Explanation \cr
 
 \examples{
 \donttest{
-cn8.to.bec(b = 2008, e = 2010)
+cn8_to_bec(b = 2008, e = 2010)
 }
 }

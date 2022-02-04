@@ -1,8 +1,8 @@
-\name{pc8.to.bec}
-\alias{pc8.to.bec}
+\name{pc8_to_bec}
+\alias{pc8_to_bec}
 \title{concordance list between PC8 and BEC}
 \usage{
-pc8.to.bec(b, e, historymatrix = NULL, progress = TRUE)
+pc8_to_bec(b, e, historymatrix = NULL, progress = TRUE)
 }
 \description{
 Provides a dataframe which contains all PC8 product codes and related BEC codes in the demanded time period.
@@ -10,7 +10,7 @@ Provides a dataframe which contains all PC8 product codes and related BEC codes 
 \arguments{
 \item{b}{first year of interest}
 \item{e}{last year of interest}
-\item{historymatrix}{History matrix of PC8 product codes. Provided by history.martix.pc8().}
+\item{historymatrix}{History matrix of PC8 product codes. Provided by history_matrix_pc8().}
 \item{progress}{logical, determines whether progress is printed in console or not.}
 }
 
@@ -29,6 +29,6 @@ Variable \tab	Explanation \cr
 
 \examples{
 \donttest{
-pc8.to.bec(b = 2008, e = 2010)
+pc8_to_bec(b = 2008, e = 2010)
 }
 }

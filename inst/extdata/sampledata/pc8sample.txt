@@ -1,4 +1,4 @@
-firmID;year;PC8;sales
+firmID;year;PC8;value
 ABC;2012;10122015;3
 ABC;2012;20146111;3
 ABC;2012;24431250;5

@@ -1,8 +1,8 @@
-\name{history.matrix.cn8}
-\alias{history.matrix.cn8}
-\title{Histroy matrix of CN8 product codes}
+\name{history_matrix_cn8}
+\alias{history_matrix_cn8}
+\title{History matrix of CN8 product codes}
 \usage{
-history.matrix.cn8(b, e, c1 = 1988, c2 = 2020,
+history_matrix_cn8(b, e, c1 = 1988, c2 = 2020,
                    progress = TRUE)
 }
 \description{
@@ -17,7 +17,7 @@ Provides a dataframe which contains all CN8 product codes and their history in a
 }
 
 \value{
-A data frame that contains all CN8 product codes and their history over time for the demanded time period. This dataset is the basis for the main function \code{harmonize.cn8()} and can be obtained therewith as well. The following table offers an overview of all provided variables.
+A data frame that contains all CN8 product codes and their history over time for the demanded time period. This dataset is the basis for the main function \code{harmonize_cn8()} and can be obtained therewith as well. The following table offers an overview of all provided variables.
 
 \tabular{ll}{
 Variable	\tab Explanation \cr
@@ -29,6 +29,6 @@ Variable	\tab Explanation \cr
 
 \examples{
 \donttest{
-history.matrix.cn8(b = 2008, e = 2010)
+history_matrix_cn8(b = 2008, e = 2010)
 }
 }

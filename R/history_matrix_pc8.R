@@ -5,9 +5,9 @@
 ##############################################################################
 
 #' @importFrom stats na.omit
-#' @export history.matrix.pc8
+#' @export history_matrix_pc8
 
-history.matrix.pc8 <- function(b, e, progress = TRUE) {
+history_matrix_pc8 <- function(b, e, progress = TRUE) {
   #########################
   ### input check
   #########################

@@ -1,8 +1,8 @@
-\name{history.matrix.pc8}
-\alias{history.matrix.pc8}
-\title{Histroy matrix of PC8 product codes}
+\name{history_matrix_pc8}
+\alias{history_matrix_pc8}
+\title{History matrix of PC8 product codes}
 \usage{
-history.matrix.pc8(b, e, progress = TRUE)
+history_matrix_pc8(b, e, progress = TRUE)
 }
 \description{
 Provides a dataframe which contains all PC8 product codes and their history in a given time period.
@@ -14,7 +14,7 @@ Provides a dataframe which contains all PC8 product codes and their history in a
 }
 
 \value{
-A data frame that contains all PC8 product codes and their history over time for the demanded time period. This dataset is the basis for the main function \code{harmonize.pc8()} and can be obtained therewith as well. The following table offers an overview of all provided variables.
+A data frame that contains all PC8 product codes and their history over time for the demanded time period. This dataset is the basis for the main function \code{harmonize_pc8()} and can be obtained therewith as well. The following table offers an overview of all provided variables.
 
 \tabular{ll}{
 Variable	\tab Explanation \cr
@@ -26,6 +26,6 @@ Variable	\tab Explanation \cr
 
 \examples{
 \donttest{
-history.matrix.pc8(b = 2008, e = 2010)
+history_matrix_pc8(b = 2008, e = 2010)
 }
 }

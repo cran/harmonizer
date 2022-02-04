@@ -51,22 +51,22 @@ example_pc8_changes <- readRDS(paste0(file_path, "/PC8/PC8_2010_2011.rds"))
 example_pc8_cn8_concordance <- readRDS(paste0(file_path, "/PC8/PC8_CN8_2010.rds"))
 ```
 
-This package provides several functions to harmonize _CN8_ product codes as well as _PC8_ product codes. All functions are listed below:
+This package provides several functions to harmonize _CN8_ product codes ([Combined Nomenclature 8 digits](https://ec.europa.eu/taxation_customs/business/calculation-customs-duties/customs-tariff/combined-nomenclature_en)) as well as _PC8_ product codes ([Production Communautaire 8 digits](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Industrial_production_statistics_introduced_-_PRODCOM)), _HS6_ ([Harmonized System 6 digits](https://ec.europa.eu/taxation_customs/business/calculation-customs-duties/customs-tariff/harmonized-system-general-information_en)) and _BEC_ ([Broad Economic Categories](https://unstats.un.org/unsd/trade/classifications/bec.asp)). All functions are listed below:
 
 ## Overview
 
 - [Main Functions](#idmainfunctions)
-  - [harmonize.cn8()](#idharmonize.cn8)
-  - [harmonize.pc8()](#idharmonize.pc8)
+  - [harmonize_cn8()](#idharmonize_cn8)
+  - [harmonize_pc8()](#idharmonize_pc8)
 - [Support Functions](#idsupportfunctions)
-  - [history.cn8()](#idhistory.cn8)
-  - [history.pc8()](#idhistory.pc8)
-  - [cn8.to.bec()](#idcn8.to.bec)
-  - [pc8.to.bec()](#idpc8.to.bec)
-  - [get.data.directory()](#idget.data.directory)
+  - [history_cn8()](#idhistory_cn8)
+  - [history_pc8()](#idhistory_pc8)
+  - [cn8_to_bec()](#idcn8_to_bec)
+  - [pc8_to_bec()](#idpc8_to_bec)
+  - [get_data_directory()](#idget_data_directory)
 - [Additional Functions](#idadditionalfunctions)
-  - [utilize.cn8()](#idutilize.cn8)
-  - [utilize.pc8()](#idutilize.pc8)
+  - [utilize_cn8()](#idutilize_cn8)
+  - [utilize_pc8()](#idutilize_pc8)
 - [Data Sets](#iddatasets)
   - [CN8 data](#idCN8data)
   - [PC8 data](#idPC8data)
@@ -78,9 +78,9 @@ This package provides several functions to harmonize _CN8_ product codes as well
 
 ## Main Functions  
 
-<a id="idharmonize.cn8"></a>
+<a id="idharmonize_cn8"></a>
 
-    harmonize.cn8() 
+    harmonize_cn8() 
 provides for a given time period a data frame that contains all _CN8_ product codes and their history, harmonized _CN8plus_ codes, harmonized _HS6plus_ codes, and _BEC_ classification. The "plus-codes" are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last year of interest. The following table offers an overview of all provided variables.
   
   | Variable | Explanation|
@@ -96,13 +96,13 @@ provides for a given time period a data frame that contains all _CN8_ product co
   
   
  
-  For more application details, see _?harmonization.cn8_. 
+  For more application details, see _?harmonization\_cn8_. 
   
   <hr style="border:2px solid rgb(246,246,246)"></hr>
 
-  <a id="idharmonize.pc8"></a>  
+  <a id="idharmonize_pc8"></a>  
       
-    harmonize.pc8() 
+    harmonize_pc8() 
 provides for a given time period a data frame that contains all _PC8_ product codes and their history, harmonized _PC8plus_ codes, harmonized _HS6plus_ codes, and _BEC_ classification. The "plus-codes" are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last year of interest. The following table offers an overview of all provided variables.
   
   | Variable | Explanation|
@@ -118,7 +118,7 @@ provides for a given time period a data frame that contains all _PC8_ product co
   
   
  
-  For more application details, see _?harmonization.pc8_.
+  For more application details, see _?harmonization\_pc8_.
   
   <a id="idsupportfunctions"></a>
   
@@ -126,10 +126,10 @@ provides for a given time period a data frame that contains all _PC8_ product co
 
 All support functions are used within the main functions. They provide intermediate steps to harmonize the data. However, they can be used as stand-alone functions as well.  
   
-<a id="idhistory.cn8"></a> 
+<a id="idhistory_cn8"></a> 
 
-    history.cn8() 
-  provides a data frame that contains all _CN8_ product codes and their history over time for the demanded time period. This dataset is the basis for the main function `harmonize.cn8()` and can be obtained therewith as well. The following table offers an overview of all provided variables.  
+    history_cn8() 
+  provides a data frame that contains all _CN8_ product codes and their history over time for the demanded time period. This dataset is the basis for the main function `harmonize_cn8()` and can be obtained therewith as well. The following table offers an overview of all provided variables.  
 
   | Variable | Explanation|
   |:----|:--------------|
@@ -138,14 +138,14 @@ All support functions are used within the main functions. They provide intermedi
   |flagyear | indicates the first year in which the flag was set to 1 |
   
   
-For more application details, see _?history.cn8_.
+For more application details, see _?history_cn8_.
 
 <hr style="border:2px solid rgb(246,246,246)"></hr>
   
-  <a id="idhistory.pc8"></a>
+  <a id="idhistory_pc8"></a>
   
-    history.pc8() 
-  provides a data frame that contains all _PC8_ product codes and their history over time for the demanded time period. This dataset is the basis for the main function `harmonize.PC8()` and can be obtained therewith as well. The following table offers an overview of all provided variables.  
+    history_pc8() 
+  provides a data frame that contains all _PC8_ product codes and their history over time for the demanded time period. This dataset is the basis for the main function `harmonize_PC8()` and can be obtained therewith as well. The following table offers an overview of all provided variables.  
 
   | Variable | Explanation|
   |:----|:--------------|
@@ -153,13 +153,13 @@ For more application details, see _?history.cn8_.
   |flag | either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition | 
   |flagyear | indicates the first year in which the flag was set to 1 |
 
-For more application details, see _?history.pc8_.
+For more application details, see _?history\_pc8_.
 
 <hr style="border:2px solid rgb(246,246,246)"></hr>
   
-  <a id="idcn8.to.bec"></a>
+  <a id="idcn8_to_bec"></a>
   
-    cn8.to.bec() 
+    cn8_to_bec() 
   provides a data frame that contains all _CN8_ product codes and related _BEC_ and _HS6_ codes in a given time period. Therefore, this data serves as a connection between _CN8_ and _BEC_ classification and between _CN8_ and _HS6_ classification. It forms the basis of some output of the main function, namely: _BEC_, _BEC\_agr_, _BEC\_basic\_class_ and _HS6plus_. The following table offers an overview of all provided variables.    
   
   | Variable | Explanation|
@@ -169,13 +169,13 @@ For more application details, see _?history.pc8_.
   |BEC | provides the BEC classification on a high aggregation level (1 digit) |
   |BEC\_agr | provides the BEC classification on a lower aggregation level (up to 3 digits) |
 
-  For more application details, see _?cn8.to.bec_.
+  For more application details, see _?cn8\_to\_bec_.
   
   <hr style="border:2px solid rgb(246,246,246)"></hr>
   
-  <a id="idpc8.to.bec"></a>
+  <a id="idpc8_to_bec"></a>
   
-    pc8.to.bec() 
+    pc8_to_bec() 
   provides a data frame that contains all _PC8_ product codes and related _BEC_ and _HS6_ codes in a given time period. Therefore, this data serves as a connection between _PC8_ and _BEC_ classification and between _PC8_ and _HS6_ classification. It forms the basis of some output of the main function, namely: _BEC_, _BEC\_agr_, _BEC\_basic\_class_ and _HS6plus_. The following table offers an overview of all provided variables.    
   
   | Variable | Explanation|
@@ -185,16 +185,16 @@ For more application details, see _?history.pc8_.
   |BEC | provides the BEC classification on a high aggregation level (1 digit) |
   |BEC\_agr | provides the BEC classification on a lower aggregation level (up to 3 digits) |
   
-  For more application details see _?pc8.to.bec_.
+  For more application details see _?pc8\_to\_bec_.
   
   <hr style="border:2px solid rgb(246,246,246)"></hr>
   
-  <a id="idget.data.directory"></a>
+  <a id="idget_data_directory"></a>
   
-    get.data.directory() 
+    get_data_directory() 
   provides the directory where custom data must be stored and the used data (e.g., concordance lists, list of codes) can be edited. However, before editing the employed data or using additional concordance lists for example, it is highly recommended to read first the instructions in this vignette carefully (also see section [Data Sets](#iddatasets) and [Custom Data](#idcustomdata)). The directory is provided in the R console. Further features (like open an explorer, print available data in console) are only executable if the directory path does not contain any blanks.
 
-For more application details see _?get.data.directory_.
+For more application details see _?get\_data\_directory_.
 
 <a id="idadditionalfunctions"></a>
 
@@ -210,46 +210,49 @@ These functions go beyond the primary purpose of this package. The additional fu
       
   <hr style="border:2px solid rgb(246,246,246)"></hr>
   
-  <a id="idutilize.cn8"></a>
+  <a id="idutilize_cn8"></a>
   
   
-      utilize.cn8() 
+      utilize_cn8() 
 may provide two data frames: 
 <ol type="a">
   <li> A data frame that contains all changed _CN8_ product codes per firm per year. In more detail, this means how many products remained the same, were added, were dropped, how many products were produced by a certain firm in a given year, and how many products were produced in the year after. </li>
-  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _CN8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC_agr_, _BEC_basic_class_).</li>
+  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _CN8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC\_agr_, _BEC\_basic\_class_).</li>
 </ol>
 The tables at the end of this section offer an overview of all provided variables.
       
   <hr style="border:2px solid rgb(246,246,246)"></hr>
   
-  <a id="idutilize.pc8"></a>    
+  <a id="idutilize_pc8"></a>    
   
-      utilize.pc8() 
+      utilize_pc8() 
 may provide two data frames: 
 <ol type="a">
-  <li> A data frame that contains all changed _PC8_ product codes per firm per year. In more detail, this means how many products remained the same, were added, were dropped, how many products were produced by a certain firm in a given year, and how many products were produced in the year after. </li>
-  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _PC8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC_agr_, _BEC_basic_class_).</li>
+  <li> A data frame that contains all changed _PC8_ product codes per firm per year. In more detail, this means how many products remained the same, were added or dropped - the value of the same/added/dropped products - how many products were produced by a certain firm in a given year, and how many products were produced in the year after. </li>
+  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _PC8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC\_agr_, _BEC\_basic\_class_).</li>
 </ol>
 The tables at the end of this section offer an overview of all provided variables.
 
    <hr style="border:2px solid rgb(246,246,246)"></hr>
 
-Since the provided data frames do not differ between `utilize.cn8()` and `utilize.pc8()`, in terms of notation, the tables are only provided once here.
+Since the provided data frames do not differ between `utilize_cn8()` and `utilize_pc8()`, in terms of notation, the tables are only provided once here.
 
 _Table that summarizes the output, described by the notation_ __a.__ _above:_
 
   | Variable | Explanation|
   |:----|:--------------|
   |firmID | specific code that describes a firm over the years (this code does not change over time)|
-  |period_UL | lower limit of the time period |
+  |period\_UL | lower limit of the time period |
   |period | time period in which the product was produced |
   |gap | indicating if the time period is greater than one (i.e. upper limit - lower limit > 1) |
-  |same_products | number of products that were produced in both years (i.e. remained in the product portfolio of this firm) |
-  |new_products | number of added products in the upper limit of the time period (i.e. added to the product portfolio of this firm) |
-  |dropped_products | number of dropped products in the upper limit of the time period (i.e. removed of the product portfolio of this firm) |
-  |nbr_of_products_period_LL | number of all products produced in the lower limit of the time period (i.e. entire product portfolio of this firm) |
-  |nbr_of_products_period_UL | number of all products produced in the upper limit of the time period (i.e. entire product portfolio of this firm) |
+  |same\_products | number of products that were produced in both years (i.e. remained in the product portfolio of this firm) |
+  |value\_same\_products | value of products that were produced in both years (i.e. remained in the product portfolio of this firm); the value is calculated in the upper limit of the time period |
+  |new\_products | number of added products in the upper limit of the time period (i.e. added to the product portfolio of this firm) |
+  |value\_new\_products | value of added products in the upper limit of the time period (i.e. added to the product portfolio of this firm) |
+  |dropped\_products | number of dropped products in the upper limit of the time period (i.e. removed of the product portfolio of this firm) |
+  |value\_dropped\_products | value of dropped products in the upper limit of the time period (i.e. removed of the product portfolio of this firm); the value is calculated in the lower limit of the time period |
+  |nbr\_of\_products\_period\_LL | number of all products produced in the lower limit of the time period (i.e. entire product portfolio of this firm) |
+  |nbr\_of\_products\_period\_UL | number of all products produced in the upper limit of the time period (i.e. entire product portfolio of this firm) |
   
 _Table that summarizes the output, described by the notation_ __b.__ _above:_
 
@@ -259,6 +262,7 @@ _Table that summarizes the output, described by the notation_ __b.__ _above:_
   |year | year in which the firm produced a product (provided by user)|
   |CN8 | CN8 code of firm product (provided by user)|
   |PC8 | PC8 code of firm product (provided by user)|
+  |(value) | value of the corresponding product code (may be provided by user)|
   | ... | additional columns from original firm data (provided by user)|
   |CN8plus | final harmonization, which refers to the last year of the time period|
   |PC8plus | final harmonization, which refers to the last year of the time period|
@@ -273,7 +277,7 @@ _Table that summarizes the output, described by the notation_ __b.__ _above:_
   
 ## Data Sets 
 
-By default, the package provides several data sets for CN8-, PC8-, HS6- and BEC-classification. This data allows for harmonization of CN8 product codes between 1995 and 2022 and PC8 product codes between 2007 and 2017. All available data sets are stored within the package. The function `get.data.directory()` provides support to access the data more easily.
+By default, the package provides several data sets for CN8-, PC8-, HS6- and BEC-classification. This data allows for harmonization of CN8 product codes between 1995 and 2022 and PC8 product codes between 2007 and 2017. All available data sets are stored within the package. The function `get_data_directory()` provides support to access the data more easily.
 All data included in the package was downloaded from [EU server Ramon](https://ec.europa.eu/eurostat/ramon/) originally and altered if needed.
 
 Provided data in more detail:
@@ -287,21 +291,21 @@ Provided data in more detail:
     cat(readLines(paste0(file_path, "/CN8/CN8_concordances_1988_2020.csv"), n = 6, encoding = "UTF-8"), sep = '\n')
     ```
 
-2. __PC8 data__ <a id="idPC8data"></a> is provided in the corresponding PC8 folder. This folder contains two different types of files. Firstly, a list of all existing PC8 codes for every year, e.g. for the year 2010, _PC8_2010.rds_. More technically speaking, these files provided a data frame with one column and _n_ rows, where _n_ is the number of existing CN8 codes in a given year. An example (first six lines) of the year 2010 is the following:
+2. __PC8 data__ <a id="idPC8data"></a> is provided in the corresponding PC8 folder. This folder contains two different types of files. Firstly, a list of all existing PC8 codes for every year, e.g. for the year 2010, _PC8\_2010.rds_. More technically speaking, these files provided a data frame with one column and _n_ rows, where _n_ is the number of existing CN8 codes in a given year. An example (first six lines) of the year 2010 is the following:
     ```{r, echo = FALSE}
 	  head(example_pc8)
     ```
-    Secondly, a concordance between every year is necessary. These files contain two years in their filenames, with a period of one year in between, e.g. between 2010 and 2011 this results in _PC8_2010_2011.rds_. More technically speaking, these files are data frames with two columns, which must be named "new" and "old" and _n_ rows, where _n_ is the number of changes in a given year. An example (first six lines) of the changes between 2010  and 2011 is the following:
+    Secondly, a concordance between every year is necessary. These files contain two years in their filenames, with a period of one year in between, e.g. between 2010 and 2011 this results in _PC8\_2010\_2011.rds_. More technically speaking, these files are data frames with two columns, which must be named "new" and "old" and _n_ rows, where _n_ is the number of changes in a given year. An example (first six lines) of the changes between 2010  and 2011 is the following:
     ```{r, echo = FALSE}
     head(example_pc8_changes)
     ```
-    Thirdly, the PC8 folder contains concordance lists between PC8- and CN8- classifications for every year. This data is needed in terms of translating PC8 into BEC. An example for the year 2010 would be _PC8_CN8_2010.rds_. Technically this means, a data frame with two columns, named "PRCCODE" for PC8 codes and "CNCODE" for CN8 codes and _n_ rows, where _n_ is the number of concordances between specific codes is provided by every year. However, no concordance between PC8 and CN8 may be possible. In this case, the missing value is filled by _NA_. Some examples out of the associated file for the year 2010 can be found below:
+    Thirdly, the PC8 folder contains concordance lists between PC8- and CN8- classifications for every year. This data is needed in terms of translating PC8 into BEC. An example for the year 2010 would be _PC8\_CN8\_2010.rds_. Technically this means, a data frame with two columns, named "PRCCODE" for PC8 codes and "CNCODE" for CN8 codes and _n_ rows, where _n_ is the number of concordances between specific codes is provided by every year. However, no concordance between PC8 and CN8 may be possible. In this case, the missing value is filled by _NA_. Some examples out of the associated file for the year 2010 can be found below:
     ```{r, echo = FALSE}
     head(example_pc8_cn8_concordance)
     example_pc8_cn8_concordance[2400:2405, ]
     ```
     
-3. __HS6 data__ <a id="idHS6data"></a> is provided in the corresponding HS6 folder. This folder only contains one type of file, which are correspondence lists between the changes of HS6 codes over time. Those changes happened in several years: 1992, 1996, 2002, 2007, 2012 and 2017. For every period, a separate concordance list is necessary. csv-files provided this data, where the separator is a semicolon, i.e. "_;_" and the filenames contain both years. For example, between 1996 and 2002, the file is called _HS_1996_to_HS_1992.csv_. Also, headers are included in this file. For this specific case, they are "HS 1996" and "HS 1992". For other periods the headers change accordingly. An example (first six lines) of the changes between 1996 and 1992 is the following:
+3. __HS6 data__ <a id="idHS6data"></a> is provided in the corresponding HS6 folder. This folder only contains one type of file, which are correspondence lists between the changes of HS6 codes over time. Those changes happened in several years: 1992, 1996, 2002, 2007, 2012 and 2017. For every period, a separate concordance list is necessary. csv-files provided this data, where the separator is a semicolon, i.e. "_;_" and the filenames contain both years. For example, between 1996 and 2002, the file is called _HS\_1996\_to\_HS\_1992.csv_. Also, headers are included in this file. For this specific case, they are "HS 1996" and "HS 1992". For other periods the headers change accordingly. An example (first six lines) of the changes between 1996 and 1992 is the following:
     ```{r comment='', echo=FALSE}
     cat(readLines(paste0(file_path, "/HS6/HS_1996_to_HS_1992.csv"), n = 6, encoding = "UTF-8"), sep = '\n')
     ```
@@ -319,7 +323,7 @@ If new data is added, there are some mandatory aspects and some valuable aspects
 
 Mandatory aspects:
 
-  * New data must be stored inside the package. This can be easily done by adding new files in the appropriate subfolder of the package database. `get.data.directory()` may provide help to find the correct folder to store new data.
+  * New data must be stored inside the package. This can be easily done by adding new files in the appropriate subfolder of the package database. `get_data_directory()` may provide help to find the correct folder to store new data.
 
   * Chosen filenames must be analogue to already existing files.
   * The structure of the new data is crucial. The section [Data Sets](#iddatasets) may provide more details. In short: file-type, header names, column numbers and datatype (numeric, character, ...) are very important.

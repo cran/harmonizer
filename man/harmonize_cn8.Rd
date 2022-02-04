@@ -1,8 +1,8 @@
-\name{harmonize.cn8}
-\alias{harmonize.cn8}
+\name{harmonize_cn8}
+\alias{harmonize_cn8}
 \title{Harmonization of CN8 product codes}
 \usage{
-harmonize.cn8(b, e, historymatrix,
+harmonize_cn8(b, e, historymatrix,
               HS6breaks = c(1992, 1996, 2002, 2007, 2012, 2017),
               progress = TRUE)
 }
@@ -12,7 +12,7 @@ Provides a dataframe which contains all CN8 product codes and their history in t
 \arguments{
 \item{b}{first year of interest}
 \item{e}{last year of interest}
-\item{historymatrix}{History matrix of CN8 product codes. Provided by history.martix.cn8(). By default \emph{NULL}; the function computes the needed harmonized data.}
+\item{historymatrix}{History matrix of CN8 product codes. Provided by history_matrix_cn8(). By default \emph{NULL}; the function computes the needed harmonized data.}
 \item{HS6breaks}{Vector of years, where HS6 codes were changed. Do not edit, unless additional break is needed.}
 \item{progress}{logical, determines whether progress is printed in console or not.}
 }
@@ -35,10 +35,10 @@ Variable \tab	Explanation \cr
 
 \examples{
 \donttest{
-harmonize.cn8(b = 2008, e = 2010)
+harmonize_cn8(b = 2008, e = 2010)
 
-mydata <- history.matrix.cn8(b = 2016, e = 2018)
-myharmonization <- harmonize.cn8(b = 2016, e = 2018,
+mydata <- history_matrix_cn8(b = 2016, e = 2018)
+myharmonization <- harmonize_cn8(b = 2016, e = 2018,
                                  historymatrix = mydata)
 }
 }

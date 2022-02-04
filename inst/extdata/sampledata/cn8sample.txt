@@ -1,4 +1,4 @@
-firmID;year;CN8;expValue;impValue
+firmID;year;CN8;value;impValue
 ABC;2008;29305000;1.26;5
 AKL;2008;01011010;10.1;2.2
 AKL;2008;55159210;5.5;5.1

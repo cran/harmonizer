@@ -6,9 +6,9 @@
 
 #' @importFrom stats na.omit setNames
 #' @importFrom utils read.csv
-#' @export harmonize.cn8
+#' @export harmonize_cn8
 
-harmonize.cn8 <- function(b, e, historymatrix = NULL,
+harmonize_cn8 <- function(b, e, historymatrix = NULL,
                           HS6breaks = c(1992, 1996, 2002, 2007, 2012, 2017),
                           progress = TRUE) {
 
@@ -37,7 +37,7 @@ harmonize.cn8 <- function(b, e, historymatrix = NULL,
   fcalls <- sys.nframe()
 
   if (is.null(historymatrix)) {
-    CN8_over_time <- history.matrix.cn8(b = b, e = e, progress = progress)
+    CN8_over_time <- history_matrix_cn8(b = b, e = e, progress = progress)
 
   } else {
     if (!is.data.frame(historymatrix)) {
@@ -103,7 +103,7 @@ harmonize.cn8 <- function(b, e, historymatrix = NULL,
     }
   }
 
-  CN8_to_BEC <- cn8.to.bec(b = b, e = e, historymatrix = CN8_over_time, progress = FALSE)
+  CN8_to_BEC <- cn8_to_bec(b = b, e = e, historymatrix = CN8_over_time, progress = FALSE)
 
   change_code <- rep("clear_code",nrow(CN8_over_time))
   new_code <- rep(0,nrow(CN8_over_time))

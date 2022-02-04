@@ -6,9 +6,9 @@
 
 #' @importFrom stats na.omit
 #' @importFrom utils read.table
-#' @export history.matrix.cn8
+#' @export history_matrix_cn8
 
-history.matrix.cn8 <- function(b, e, c1 = 1988, c2 = 2020, progress = TRUE) {
+history_matrix_cn8 <- function(b, e, c1 = 1988, c2 = 2020, progress = TRUE) {
   #########################
   ### input check
   #########################

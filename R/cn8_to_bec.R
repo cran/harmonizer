@@ -6,9 +6,9 @@
 
 #' @importFrom stats na.omit setNames
 #' @importFrom utils read.csv read.table
-#' @export cn8.to.bec
+#' @export cn8_to_bec
 
-cn8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
+cn8_to_bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
   #########################
   ### input check
   #########################
@@ -33,7 +33,7 @@ cn8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
   #########################
   if (is.null(historymatrix)) {
     mod_part <- 3
-    CN8_over_time <- history.matrix.cn8(b = b, e = e, progress = progress)
+    CN8_over_time <- history_matrix_cn8(b = b, e = e, progress = progress)
   } else {
     if (!is.data.frame(historymatrix)) {
       stop("The entered history matrix is not a dataframe. Please correct.")
@@ -128,8 +128,8 @@ cn8.to.bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
     }
   }
 
-  BEC_arg <- substr(CN8_to_BEC$BEC, start = 1, stop = 1)
-  CN8_to_BEC$BEC_agr <- BEC_arg
+  BEC_agr <- substr(CN8_to_BEC$BEC, start = 1, stop = 1)
+  CN8_to_BEC$BEC_agr <- BEC_agr
   rownames(CN8_to_BEC) <- NULL
 
   if (progress) {
