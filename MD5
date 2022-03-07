@@ -1,6 +1,6 @@
-4fd8a8039525a337f59f8cf4dee49459 *DESCRIPTION
+06c0cd0390b822fb15751410aa99842a *DESCRIPTION
 09c8377fb80364cfd60fb93156f03fa7 *NAMESPACE
-af0bde1cd2493825716e49a2f3b91b94 *NEWS.md
+ed278fe82304f0b71b801a8dc763e460 *NEWS.md
 1ca8b51b33f91c3102505af5484572e1 *R/cn8_to_bec.R
 1539f2185ba1f879d9eefe27b581ddb3 *R/get_data_directory.R
 c8e88b2372952eee0072a337ddcf1233 *R/harmonize_cn8.R
@@ -13,8 +13,8 @@ e16e032c712006f1f0d8842c31a69cdf *R/history_matrix_cn8.R
 a9022a107589446ae1c9de6e81a4f687 *README.md
 110cf6ff54b1158dde04ab7f730554a1 *build/vignette.rds
 a4abdfd43f08171382e8ee96392e0c4f *inst/doc/harmonizer.R
-e92d9b7b5bdc4c0b5c1a8d07656aab95 *inst/doc/harmonizer.Rmd
-8e1a9e578b6f3fdeb926cbb349107f4d *inst/doc/harmonizer.html
+9ddbe445465531ae0c872e985448ceb7 *inst/doc/harmonizer.Rmd
+e9e4d88557115ed4f2215928fa82dc3c *inst/doc/harmonizer.html
 5286529a554f9b183a18488c4272e42b *inst/extdata/CN8/CN8_1995.rds
 8775ec953e7ef0890c006d88e752251d *inst/extdata/CN8/CN8_1996.rds
 1e234483d896a5b061fef016ac15a644 *inst/extdata/CN8/CN8_1997.rds
@@ -97,4 +97,4 @@ a9083f7a75aadf6baa819a90f50c193a *man/harmonize_pc8.Rd
 840915f6616e604dedad19d7c2806bc2 *man/pc8_to_bec.Rd
 8df9b107220b27de93f78021f36120f5 *man/utilize_cn8.Rd
 ec90ecda794f666eeefad3330d6209ab *man/utilize_pc8.Rd
-e92d9b7b5bdc4c0b5c1a8d07656aab95 *vignettes/harmonizer.Rmd
+9ddbe445465531ae0c872e985448ceb7 *vignettes/harmonizer.Rmd

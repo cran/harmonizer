@@ -1,13 +1,16 @@
 Package: harmonizer
 Type: Package
-Date: 2022-02-04
+Date: 2022-03-07
 Title: Harmonizing CN8 and PC8 Product Codes
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Christoph", "Baumgartner", email = "Christoph.Baumgartner@uibk.ac.at", role = c("cre", "aut")),
+    person("Stjepan", "Srhoj", email = "stjepan.srhoj@efst.hr", role = "aut", 
+           comment = c(ORCID = "0000-0002-7105-8088")),	
     person("Janette", "Walde", email = "Janette.Walde@uibk.ac.at", role = "aut", 
 	   comment = c(ORCID = "0000-0002-1241-5292")))
 Author: Christoph Baumgartner [cre, aut],
+  Stjepan Srhoj [aut] (<https://orcid.org/0000-0002-7105-8088>),
   Janette Walde [aut] (<https://orcid.org/0000-0002-1241-5292>)
 Maintainer: Christoph Baumgartner <Christoph.Baumgartner@uibk.ac.at>
 Description: Several functions are provided to harmonize CN8 (Combined Nomenclature 
@@ -24,6 +27,6 @@ RoxygenNote: 7.1.2
 Suggests: rmarkdown, knitr
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-02-04 16:57:29 UTC; Baumg
+Packaged: 2022-03-07 11:32:35 UTC; Baumg
 Repository: CRAN
-Date/Publication: 2022-02-05 00:30:13 UTC
+Date/Publication: 2022-03-07 11:50:02 UTC

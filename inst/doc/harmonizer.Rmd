@@ -1,8 +1,9 @@
 ---
 title: "Harmonizing Product Codes with R"
 author: 
-  - Christoph Baumgartner^[Universität Innsbruck, Christoph.Baumgartner@uibk.ac.at]
-  - Janette Walde^[Universität Innsbruck, Janette.Walde@uibk.ac.at]
+  - Christoph Baumgartner^[Faculty of Economics and Statistics, University of Innsbruck, Christoph.Baumgartner@uibk.ac.at]
+  - Stjepan Srhoj^[Faculty of Economics, Business and Tourism, University of Split, stjepan.srhoj@efst.hr]
+  - Janette Walde^[Faculty of Economics and Statistics, University of Innsbruck, Janette.Walde@uibk.ac.at]
 package: harmonizer
 output: rmarkdown::html_vignette
 abstract: Innovation is a major engine of economic growth. To compare products over time, harmonization of product codes is mandatory. This package provides an _easy-to-use_ approach to harmonize product codes. Moreover, it offers an application that allows finding all new and dropped products for given firm-level data based on harmonized product codes.
