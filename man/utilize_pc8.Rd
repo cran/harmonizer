@@ -4,7 +4,7 @@
 \usage{
 utilize_pc8(b, e, firm_data, harmonized_data = NULL,
             progress = TRUE, output = "merged.firm.data",
-            value = FALSE)
+            value = FALSE, base = "PC8")
 }
 \description{
 Provide an application of the data frames obtained by the main function, \code{harmonize_pc8}. To use these additional functions, data on firm-level is required, which is data that is not provided by the package.
@@ -17,18 +17,24 @@ Provide an application of the data frames obtained by the main function, \code{h
 \item{progress}{logical, determines whether progress is printed in console or not.}
 \item{output}{Defines which dataframe is returned. It may take the following values:
       \itemize{
-          \item{"product.changes", returns all changed PC8 product codes per firm per year (see description of (a) above)}
-          \item{"merged.firm.data", returns entered firm data, extended by harmonized data (see description of (b) above)}
+          \item{"product.changes", returns all changed PC8 product codes per firm per year (see description of (a) below)}
+          \item{"merged.firm.data", returns entered firm data, extended by harmonized data (see description of (b) below)}
           \item{"all", returns both dataframes as a list}
       }
   }
 \item{value}{logical, determines whether value is calculated for same/new/dropped products. Only possible if data contains a column: "value". Value may contain different quantities (e.g. sales [Euro] or weight [kg]).}
+\item{base}{Defines which plus-codes are used as a base for calculating added/dropped/same products and their corresponding values. It may take the following values:
+      \itemize{
+          \item{"PC8", uses CN8plus codes for computation.}
+          \item{"HS6", uses HS6plus codes for computation.}
+      }
+  }
 }
 
 \value{
 Provides two possible data frames: \describe{
-  \item{(a)}{ One dataframe that contains all changed PC8 product codes per firm per year. In more detail, this means how many products remained the same, were added or dropped - the value of the same/added/dropped products - how many products were produced by a certain firm in a given year, and how many products were produced in the year after.}
-  \item{(b)}{ One dataframe that is based on the entered firm data. The entered firm data is extended by harmonized data (that is "PC8plus", "flag", "flagyear", "HS6plus", "BEC", "BEC_agr", "BEC_basic_class").}
+  \item{(a)}{ One dataframe that contains all changed PC8 product codes per firm per year. In more detail, this means how many products remained the same, were added or dropped - the value of the same/added/dropped products - how many products were produced by a certain firm in a given year, and how many products were produced in the year after. As a base of this computation PC8plus codes or HS6plus codes can be used.}
+  \item{(b)}{ One dataframe that is based on the entered firm data. The entered firm data is extended by harmonized data (that is "PC8plus", "flag", "flagyear", "HS6plus", "BEC", "BEC_agr", "SNA_basic_class").}
   }
 
 Table that summarizes the output, described by the notation (a) above:
@@ -64,7 +70,7 @@ Variable	\tab	Explanation \cr
 \code{HS6plus}	\tab character;	also adjusts for the change lists of HS6 \cr
 \code{BEC}	\tab character;	provides the BEC classification on a high aggregated level (1 digit) \cr
 \code{BEC_agr}	\tab character;	provides the BEC classification on a less aggregated level (up to 3 digits) \cr
-\code{BEC_basic_class}	\tab character;	provides information if the code is classified as consumption, capital or intermediate good in BEC
+\code{SNA_basic_class}	\tab character;	provides information if the code is classified as consumption, capital or intermediate good in BEC
 }
 }
 

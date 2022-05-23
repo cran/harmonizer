@@ -1,3 +1,13 @@
+# Update to version 0.3.0
+
+* harmonize_cn8() and harmonize_pc8() have a new argument "harmonize.to", which allows the user to define if harmonization is done towards the first or last year of the period of interest.
+
+* utilize_cn8() and utilize_pc8() have a new argument "base", which allows the user to define which plus-codes (CN8plus or HS6plus) are used as a base for calculating added/dropped/same products and their corresponding values.
+
+* Huge data update: PC8 data is now available from 2001 to 2021; CN8 data is now available from 1995 to 2022; BEC Rev. 5 is now available
+
+* more background information about idea of the harmonization was added to the vignette
+
 # Update to version 0.2.1
 
 * updated citation of the package

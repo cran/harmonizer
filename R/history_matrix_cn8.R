@@ -8,7 +8,7 @@
 #' @importFrom utils read.table
 #' @export history_matrix_cn8
 
-history_matrix_cn8 <- function(b, e, c1 = 1988, c2 = 2020, progress = TRUE) {
+history_matrix_cn8 <- function(b, e, c1 = 1988, c2 = 2022, progress = TRUE) {
   #########################
   ### input check
   #########################
@@ -70,7 +70,9 @@ history_matrix_cn8 <- function(b, e, c1 = 1988, c2 = 2020, progress = TRUE) {
 
   # load the concordance list from c1 to c2
   updates <- read.table(paste0(system.file("extdata", package = "harmonizer"), "/CN8/CN8_concordances_", c1,"_", c2,".csv"),
-                        header = TRUE, sep = ";")
+                        header = TRUE, sep = ";", colClasses = "character")
+  updates$from <- as.integer(updates$from)
+  updates$to <- as.integer(updates$to)
   updates$obsolete <- gsub(" ", "", updates$obsolete, fixed = TRUE)
   updates$new <- gsub(" ", "", updates$new, fixed = TRUE)
 

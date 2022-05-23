@@ -2,7 +2,7 @@
 \alias{history_matrix_cn8}
 \title{History matrix of CN8 product codes}
 \usage{
-history_matrix_cn8(b, e, c1 = 1988, c2 = 2020,
+history_matrix_cn8(b, e, c1 = 1988, c2 = 2022,
                    progress = TRUE)
 }
 \description{

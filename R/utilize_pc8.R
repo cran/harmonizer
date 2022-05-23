@@ -5,11 +5,12 @@
 ############################################################################
 
 #' @importFrom stats na.omit
+#' @importFrom methods is
 #' @export utilize_pc8
 
 utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
                         progress = TRUE, output = "merged.firm.data",
-                        value = FALSE) {
+                        value = FALSE, base = "PC8") {
 
   #########################
   ### check variable "output"
@@ -17,6 +18,14 @@ utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
 
   if(!output %in% c("product.changes", "merged.firm.data", "all")) {
     stop(paste0("'", output, "' is not a valid input for 'output'."))
+  }
+
+  #########################
+  ### check variable "base"
+  #########################
+
+  if(!base %in% c("PC8", "HS6")) {
+    stop(paste0("'", base, "' is not a valid input for 'base'."))
   }
 
   #########################
@@ -31,7 +40,7 @@ utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
   if (!any(grep("PC8", colnames(firm_data)))) {
     stop("The entered firm data does not contain a column named 'PC8'. Please correct.")
   }
-  if (class(firm_data$PC8) != "character") {
+  if (!is(firm_data$PC8, "character")) {
     stop("The column 'PC8' has a wrong class. Please convert to 'character'.")
   }
   ### check value column if needed
@@ -101,7 +110,7 @@ utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
 
   temp1 <- subset(PC8_harm, select = c("PC8plus", "flag", "flagyear",
                                        "HS6plus", "BEC",
-                                       "BEC_agr", "BEC_basic_class"))
+                                       "BEC_agr", "SNA_basic_class"))
   # merge firm data with harmonized data
   get_harm <- function(x) {
     ifelse(length(which(current_df == x)) > 0,
@@ -121,7 +130,7 @@ utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
   firm_data$HS6plus <- unlist(firm_data_list)[unlistindex[4,]]
   firm_data$BEC <- unlist(firm_data_list)[unlistindex[5,]]
   firm_data$BEC_agr <- unlist(firm_data_list)[unlistindex[6,]]
-  firm_data$BEC_basic_class <- unlist(firm_data_list)[unlistindex[7,]]
+  firm_data$SNA_basic_class <- unlist(firm_data_list)[unlistindex[7,]]
 
   if (output == "merged.firm.data"){
     if (progress) {
@@ -183,8 +192,13 @@ utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
           dataNPsales$period[temp] <- paste0(year, "-", nextyear)
 
           # idyear = codes in year t; idnextyear = codes in year t + 1
-          idyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == year]))
-          idnextyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == nextyear]))
+          if (base == "PC8") {
+            idyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == year]))
+            idnextyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == nextyear]))
+          } else {
+            idyear <- unique(na.omit(datafirm$HS6plus[datafirm$year == year]))
+            idnextyear <- unique(na.omit(datafirm$HS6plus[datafirm$year == nextyear]))
+          }
 
           # In both years exist product codes for a specific firm
           if (length(idyear) != 0 & length(idnextyear) != 0) {
@@ -211,10 +225,17 @@ utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
           }
 
           ### calculate value
-          # get index for the current year codes
-          idx_idyear <- sapply(idyear, FUN = function(x) {which(datafirm$PC8plus == x)}, simplify = FALSE)
-          # get index for the next year codes
-          idx_idnextyear <- sapply(idnextyear, FUN = function(x) {which(datafirm$PC8plus == x)}, simplify = FALSE)
+          if (base == "PC8") {
+            # get index for the current year codes
+            idx_idyear <- sapply(idyear, FUN = function(x) {which(datafirm$PC8plus == x)}, simplify = FALSE)
+            # get index for the next year codes
+            idx_idnextyear <- sapply(idnextyear, FUN = function(x) {which(datafirm$PC8plus == x)}, simplify = FALSE)
+          } else {
+            # get index for the current year codes
+            idx_idyear <- sapply(idyear, FUN = function(x) {which(datafirm$HS6plus == x)}, simplify = FALSE)
+            # get index for the next year codes
+            idx_idnextyear <- sapply(idnextyear, FUN = function(x) {which(datafirm$HS6plus == x)}, simplify = FALSE)
+          }
           # sum up all values of same products in next year
           # for intersect it must hold (all codes that remained the same & year = nextyear)
           dataNPsales$value_same_products[temp] <- sum(datafirm$value[intersect(unlist(idx_idnextyear[idyear[idyear %in% idnextyear]]), which(datafirm$year == nextyear))], na.rm = TRUE)
@@ -295,8 +316,13 @@ utilize_pc8 <- function(b, e, firm_data, harmonized_data = NULL,
           dataNPsales$period[temp] <- paste0(year, "-", nextyear)
 
           # idyear = codes in year t; idnextyear = codes in year t + 1
-          idyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == year]))
-          idnextyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == nextyear]))
+          if (base == "PC8") {
+            idyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == year]))
+            idnextyear <- unique(na.omit(datafirm$PC8plus[datafirm$year == nextyear]))
+          } else {
+            idyear <- unique(na.omit(datafirm$HS6plus[datafirm$year == year]))
+            idnextyear <- unique(na.omit(datafirm$HS6plus[datafirm$year == nextyear]))
+          }
 
           # In both years exist product codes for a specific firm
           if (length(idyear) != 0 & length(idnextyear) != 0) {

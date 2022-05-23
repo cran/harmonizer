@@ -5,10 +5,10 @@
 ###############################################################################
 
 #' @importFrom stats na.omit setNames
-#' @importFrom utils read.csv
+#' @importFrom utils read.csv2
 #' @export harmonize_pc8
 
-harmonize_pc8 <- function(b, e, historymatrix = NULL,
+harmonize_pc8 <- function(b, e, historymatrix = NULL, harmonize.to = "e",
                           HS6breaks = c(1992, 1996, 2002, 2007, 2012, 2017),
                           progress = TRUE) {
 
@@ -28,7 +28,21 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL,
     stop("There is no data avilable for the first year of interest (b). Consider changing the time periode, or alter data (-> get.data.directory()).")
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", e, ".rds"))) {
-    stop("There is no data avilable for the first year of interest (e). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the last year of interest (e). Consider changing the time periode, or alter data (-> get.data.directory()).")
+  }
+
+  #########################
+  ### define harmonization start/end
+  #########################
+
+  if (!(harmonize.to %in% c("b", "e"))) {
+    stop("Invalid value of 'harmonize.to', 'harmonize.to' must be set to 'e' or 'b'.")
+  }
+
+  if(harmonize.to == "e") {
+    harm_year <- e
+  } else {
+    harm_year <- b
   }
 
   #########################
@@ -87,16 +101,16 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL,
     }
     index <- unique(index)
     filenames <- filenames[index]
-    correspondence_lists <- lapply(filenames, read.csv)
+    correspondence_lists <- lapply(filenames, read.csv2)
 
     # split up data and rename cols
     for(i in 1:length(correspondence_lists)) {
       # unlist as dataframe
-      assign(paste0("correspondence_", breaks[idx_breaks][i]), as.data.frame(correspondence_lists[i], responseName = c("HS6", "BEC")))
-      # split up in two cols
-      assign(paste0("correspondence_", breaks[idx_breaks][i]),
-             data.frame(do.call("rbind", strsplit(as.character(eval(parse(text = paste0("correspondence_", breaks[idx_breaks][i], "[[1]]")))),
-                                                  ";", fixed = TRUE))), )
+      assign(paste0("correspondence_", breaks[idx_breaks][i]), as.data.frame(correspondence_lists[i]))
+    #   # split up in two cols
+    #   assign(paste0("correspondence_", breaks[idx_breaks][i]),
+    #          data.frame(do.call("rbind", strsplit(as.character(eval(parse(text = paste0("correspondence_", breaks[idx_breaks][i], "[[1]]")))),
+    #                                               ";", fixed = TRUE))), )
       # rename cols
       assign(paste0("correspondence_", breaks[idx_breaks][i]),
              setNames(eval(parse(text = paste0("correspondence_", breaks[idx_breaks][i]))), c("new", "old")))
@@ -177,10 +191,10 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL,
     print(paste0("Work in progress... Part ", mod_partb, "/" , mod_parte, ": 100%"))
   }
 
-  # Harmonization to year e
-  PC8_over_time$PC8plus <- PC8_over_time[,paste0("PC8_",e)]
+  # Harmonization to year harm_year
+  PC8_over_time$PC8plus <- PC8_over_time[,paste0("PC8_", harm_year)]
   PC8_over_time$PC8plus[PC8_over_time$change_code == 1 | PC8_over_time$new_code != 0 | PC8_over_time$flag == 1] <- tied_codes
-  PC8_over_time$PC8plus[PC8_over_time$PC8plus == "no_ties"] <- PC8_over_time[PC8_over_time$PC8plus == "no_ties",paste0("PC8_",e)]
+  PC8_over_time$PC8plus[PC8_over_time$PC8plus == "no_ties"] <- PC8_over_time[PC8_over_time$PC8plus == "no_ties",paste0("PC8_", harm_year)]
 
   PC8_over_time <- PC8_over_time[,!(colnames(PC8_over_time) %in% c("change_code"))]
 
@@ -203,7 +217,7 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL,
     # otherwise the apply function does not work properly
     HS6_temp[, paste0("PC8_",years[i])][is.na(HS6_temp[, paste0("PC8_",years[i])])] <- "removed"
     # find the corresponding HS6 codes
-    indexhs6 <- unlist(apply(as.matrix(HS6_temp[, paste0("PC8_",years[i])]), 1, grep, x = PC8_to_BEC$PC8))
+    indexhs6 <- unlist(apply(as.matrix(paste0("\\b", HS6_temp[, paste0("PC8_",years[i])], "\\b")), 1, grep, x = PC8_to_BEC$PC8))
     # find which PC8 codes have a replacement
     indexpc8 <- HS6_temp[, paste0("PC8_", years[i])] %in% PC8_to_BEC$PC8
     # replace PC8 with HS6 if possible
@@ -244,7 +258,7 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL,
         } else {
           # derive last block (> last break)
           if (s == (length(breaks[idx_breaks]) + 1)) {
-            temp_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) >= breaks[length(breaks)]
+            temp_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) >= breaks[idx_breaks][length(breaks[idx_breaks])] #breaks[length(breaks)]
             temp_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][temp_years]
             # get all codes in last "time block"
             assign(paste0("block_", s), as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], temp_years_names]))
@@ -363,18 +377,57 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL,
   PC8_over_time$HS6 <- NULL
   PC8_over_time$new_code <- NULL
 
+
+
   #############################################
 
-  # define BEC
-  PC8_over_time$BEC_basic_class <- PC8_over_time$BEC
-  PC8_over_time$BEC_basic_class[which(PC8_over_time$BEC_basic_class %in% c("41", "521"))] <- "Capital good"
-  PC8_over_time$BEC_basic_class[PC8_over_time$BEC_basic_class %in% c("111", "121", "21",
-                                                                     "22", "31", "322",
-                                                                     "42", "53")] <- "Intermediate good"
-  PC8_over_time$BEC_basic_class[PC8_over_time$BEC_basic_class %in% c("112", "122", "522",
-                                                                     "61", "62", "63")] <- "Consumption good"
-  PC8_over_time$BEC_basic_class[PC8_over_time$BEC_basic_class %in% c("51", "321")] <- "Consumption good / Intermediate good"
-  PC8_over_time$BEC_basic_class[PC8_over_time$BEC_basic_class %in% c("7")] <- "not_defined"
+  # define SNA
+  if(e < 2012) {
+    PC8_over_time$SNA_basic_class <- PC8_over_time$BEC
+    PC8_over_time$SNA_basic_class[which(PC8_over_time$SNA_basic_class %in% c("41", "521"))] <- "Capital good"
+    PC8_over_time$SNA_basic_class[PC8_over_time$SNA_basic_class %in% c("111", "121", "21",
+                                                                       "22", "31", "322",
+                                                                       "42", "53")] <- "Intermediate good"
+    PC8_over_time$SNA_basic_class[PC8_over_time$SNA_basic_class %in% c("112", "122", "522",
+                                                                       "61", "62", "63")] <- "Consumption good"
+    PC8_over_time$SNA_basic_class[PC8_over_time$SNA_basic_class %in% c("51", "321", "7")] <- "not_defined"
+
+  } else {
+    PC8_over_time$SNA_basic_class <- PC8_over_time$BEC
+    PC8_over_time$SNA_basic_class[which(PC8_over_time$SNA_basic_class %in% c("112", "112010", "112020",
+                                                                             "212", "212010", "212020",
+                                                                             "312", "312010", "312020",
+                                                                             "412", "412010", "412020",
+                                                                             "512", "512010", "512020",
+                                                                             "612", "612010", "612020",
+                                                                             "712", "712010", "712020",
+                                                                             "812", "812010", "812020"))] <- "Gross Fixed Capital Formation"
+    PC8_over_time$SNA_basic_class[PC8_over_time$SNA_basic_class %in% c("111", "1111", "1112", "111210", "111220", "121", "121010", "121020",
+                                                                       "211", "2111", "2112", "211210", "211220", "221", "221010", "221020",
+                                                                       "311", "3111", "3112", "311210", "311220", "321", "321010", "321020",
+                                                                       "411", "4111", "4112", "411210", "411220", "421", "421010", "421020",
+                                                                       "511", "5111", "5112", "511210", "511220", "521", "521010", "521020",
+                                                                       "611", "6111", "6112", "611210", "611220", "621", "621010", "621020",
+                                                                       "711", "7111", "7112", "711210", "711220", "721", "721010", "721020",
+                                                                       "811", "8111", "8112", "811210", "811220", "821", "821010", "821020")] <- "Intermediate Consumption"
+    PC8_over_time$SNA_basic_class[PC8_over_time$SNA_basic_class %in% c("113", "1131", "113101", "113102", "1132", "113201", "113202", "123",
+                                                                       "213", "2131", "213101", "213102", "2132", "213201", "213202", "223",
+                                                                       "313", "3131", "313101", "313102", "3132", "313201", "313202", "323",
+                                                                       "413", "4131", "413101", "413102", "4132", "413201", "413202", "423",
+                                                                       "513", "5131", "513101", "513102", "5132", "513201", "513202", "523",
+                                                                       "613", "6131", "613101", "613102", "6132", "613201", "613202", "623",
+                                                                       "713", "7131", "713101", "713102", "7132", "713201", "713202", "723",
+                                                                       "813", "8131", "813101", "813102", "8132", "813201", "813202", "823")] <- "Final Consumption"
+  }
+
+  # remove PC8plus, HS6plus, BEC and SNA if not harmonizeable, i.e. NA in year harm_year
+
+  idx_na_e <- which(is.na(eval(parse(text = paste0("PC8_over_time$PC8_", harm_year)))))
+  PC8_over_time$PC8plus[idx_na_e] <- NA
+  PC8_over_time$HS6plus[idx_na_e] <- NA
+  PC8_over_time$BEC[idx_na_e] <- NA
+  PC8_over_time$BEC_agr[idx_na_e] <- NA
+  PC8_over_time$SNA_basic_class[idx_na_e] <- NA
 
   PC8_over_time <- PC8_over_time[!duplicated(PC8_over_time),]
 

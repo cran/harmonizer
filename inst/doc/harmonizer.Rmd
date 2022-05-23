@@ -56,6 +56,7 @@ This package provides several functions to harmonize _CN8_ product codes ([Combi
 
 ## Overview
 
+- [Idea behind harmonization](#ididea)
 - [Main Functions](#idmainfunctions)
   - [harmonize_cn8()](#idharmonize_cn8)
   - [harmonize_pc8()](#idharmonize_pc8)
@@ -75,6 +76,24 @@ This package provides several functions to harmonize _CN8_ product codes ([Combi
   - [BEC data](#idBECdata)
 - [Custom Data](#idcustomdata)
 
+<a id="ididea"></a>
+
+## Idea behind harmonization
+
+The basic idea that stands behind the harmonization is to keep track of each single code, during a certain time period. In the simplest case, a code doesn't change during the examined period, i.e. no harmonization needed. In any other case, all changes, which are associated with a specific code need to be documented. There are different kinds of changes: 1 to 1, 1 to many, may to 1, many to many, 1 to none, none to 1. The last two described changes, simply mean that a code was dropped, respectively that a new code was created. Those two procedures are only possible for PC8- and not for CN8-classification. 1 to many or many to 1 changes can occur, if two or more codes are split, respectively merged. It is also possible that a  'mixture' of changes is present, e.g. a code can merge and remain the same in terms of notation at the same time.
+
+In a more technical way this means, a _(n + m)_ x _k_ matrix, consecutively referred to as 'history matrix', is designed to store all the information, where _n_ is the number of observations, _m_ is the number of added rows due changes and k the number of years. In this matrix every row represents a history of a particular code. For every code that has multiple replacements in one year a new row has to be added to the matrix. This is necessary, since one has to keep track of the changed codes as well. History matrices are designed for CN8- and for PC8-classification. These history matrices are used as a input for the final harmonization.
+In the further process, the history matrices are extended by new variables, like additional classification systems (HS6, BEC), binary indication variables and the harmonized code itself. 
+
+The goal of the harmonization is to make a comparison possible for the give time period. Therefore a baseline is created, defined in the last year of the period. This information is stored in the variable _CN8plus_ (or _PC8plus_ respectively). In order to achieve this information, the harmonization is done in several steps. Firstly, one has to check if a code didn't change, i.e. all codes between the first and the last year of interest are the same and no change appeared in addition. If this is the case, this code does not need further harmonization and is used as _CN8plus_ already. Secondly, all connections among codes need to be documented. This means if a code split or merged into several codes for example, this codes are grouped together from now on (consecutively referred to as _family_). If a mixture of changes, e.g. a code split and remained the same in terms of notation in the same year, this information is stored in a binary variable '_flag_'. However, these codes with flag-variables being 1, are also part of a certain family. Summarizing this means, if one takes all this information into account, one reaches the professed goal of _CN8plus_, which therefore includes all codes that did not change and all families. 
+
+The additional classification systems, are based on _CN8plus_ (or _PC8plus_ respectively). Since CN8 and HS6 are closely connected (HS6 are the first six digits of CN8), this transformation is mostly straight forward and is stored in the variable _HS6_. However, HS6 changes its classification due a separate change-list as well. Considering these lists, yields the variable _HS6plus_. For PC8 codes it is not that easy. Here, first all PC8 codes need to be translated into CN8 codes (if possible) and afterwards the same procedure like with CN8 codes is used. Note that not all PC8 codes do have a corresponding CN8 code. Therefore some codes might be lost due to this issue.
+
+The BEC classification system is also based on _CN8plus_. Concordance lists between CN8 and BEC are used to derive this classification. This information is stored in several ways: higher (one digit) and lower (up to 3 digits) aggregation as well as the basic class of the good. If _CN8plus_ contains a family, it is not possible to assign a HS6- nor a BEC-classification, because a family can include several different codes, with again several different related HS6- and BEC-codes. 
+The resulting matrix, we will call it _harmonization matrix_ from now on, is therefore a _(n + m)_ x _(k + l)_ matrix, where the additional parameter _l_ describes the the added columns.
+
+Concordance files between HS6 and BEC Rev. 4 exist for 1996, 2002, and 2007. For 2012 and 2017, there exists a concordance between HS6 and BEC Rev. 5. Therefore, we provide BEC codes from Rev. 4 until 2011 and BEC codes from Rev. 5 thereafter. Moreover, BEC codes can be classified into three basic classes defined by the [System of National Accounts](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Building_the_System_of_National_Accounts_-_basic_concepts&oldid=452465) (SNA), which focus on the end-use of the product.
+
 <a id="idmainfunctions"></a>
 
 ## Main Functions  
@@ -82,16 +101,16 @@ This package provides several functions to harmonize _CN8_ product codes ([Combi
 <a id="idharmonize_cn8"></a>
 
     harmonize_cn8() 
-provides for a given time period a data frame that contains all _CN8_ product codes and their history, harmonized _CN8plus_ codes, harmonized _HS6plus_ codes, and _BEC_ classification. The "plus-codes" are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last year of interest. The following table offers an overview of all provided variables.
+provides for a given time period a data frame that contains all _CN8_ product codes and their history, harmonized _CN8plus_ codes, harmonized _HS6plus_ codes, and _BEC_ classification. The "plus-codes" are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last/first year of interest. The following table offers an overview of all provided variables.
   
   | Variable | Explanation|
   |:----|:--------------|
   |CN8\_xxxx | a specific CN8 code in a given year|
-  |CN8plus | the harmonization code for CN8, which refers to the last year of the time period|
-  |HS6plus | the harmonization code of HS6, which refers to the last year of the time period|
+  |CN8plus | the harmonization code for CN8, which refers to the last/first year of the time period|
+  |HS6plus | the harmonization code of HS6, which refers to the last/first year of the time period|
   |BEC | provides the BEC classification at a high aggregation level (1 digit) |
   |BEC\_agr | provides the BEC classification at a lower aggregation level (up to 3 digits) |
-  |BEC\_basic\_class | provides information if the code is classified as consumption, capital or intermediate good in BEC |
+  |SNA\_basic\_class | provides information if the code is classified as consumption, capital or intermediate good in SNA |
   |flag | either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition | 
   |flagyear | indicates the first year in which the flag was set to 1 |
   
@@ -104,16 +123,16 @@ provides for a given time period a data frame that contains all _CN8_ product co
   <a id="idharmonize_pc8"></a>  
       
     harmonize_pc8() 
-provides for a given time period a data frame that contains all _PC8_ product codes and their history, harmonized _PC8plus_ codes, harmonized _HS6plus_ codes, and _BEC_ classification. The "plus-codes" are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last year of interest. The following table offers an overview of all provided variables.
+provides for a given time period a data frame that contains all _PC8_ product codes and their history, harmonized _PC8plus_ codes, harmonized _HS6plus_ codes, and _BEC_ classification. The "plus-codes" are the main outcome of the function. They provide harmonized information of the product codes, i.e. comparable codes. Every harmonization refers to the last/first year of interest. The following table offers an overview of all provided variables.
   
   | Variable | Explanation|
   |:----|:--------------|
   |PC8\_xxxx | a specific PC8 code in a given year|
-  |PC8plus | the harmonization code for PC8, which refers to the last year of the time period|
-  |HS6plus | the harmonization code of HS6, which refers to the last year of the time period|
+  |PC8plus | the harmonization code for PC8, which refers to the last/first year of the time period|
+  |HS6plus | the harmonization code of HS6, which refers to the last/first year of the time period|
   |BEC | provides the BEC classification at a high aggregation level (1 digit) |
   |BEC\_agr | provides the BEC classification at a lower aggregation level (up to 3 digits) |
-  |BEC\_basic\_class | provides information if the code is classified as consumption, capital or intermediate good in BEC |
+  |SNA\_basic\_class | provides information if the code is classified as consumption, capital or intermediate good in BEC |
   |flag | either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition | 
   |flagyear | indicates the first year in which the flag was set to 1 |
   
@@ -161,7 +180,7 @@ For more application details, see _?history\_pc8_.
   <a id="idcn8_to_bec"></a>
   
     cn8_to_bec() 
-  provides a data frame that contains all _CN8_ product codes and related _BEC_ and _HS6_ codes in a given time period. Therefore, this data serves as a connection between _CN8_ and _BEC_ classification and between _CN8_ and _HS6_ classification. It forms the basis of some output of the main function, namely: _BEC_, _BEC\_agr_, _BEC\_basic\_class_ and _HS6plus_. The following table offers an overview of all provided variables.    
+  provides a data frame that contains all _CN8_ product codes and related _BEC_ and _HS6_ codes in a given time period. Therefore, this data serves as a connection between _CN8_ and _BEC_ classification and between _CN8_ and _HS6_ classification. It forms the basis of some output of the main function, namely: _BEC_, _BEC\_agr_, _SNA\_basic\_class_ and _HS6plus_. The following table offers an overview of all provided variables.    
   
   | Variable | Explanation|
   |:----|:--------------|
@@ -177,7 +196,7 @@ For more application details, see _?history\_pc8_.
   <a id="idpc8_to_bec"></a>
   
     pc8_to_bec() 
-  provides a data frame that contains all _PC8_ product codes and related _BEC_ and _HS6_ codes in a given time period. Therefore, this data serves as a connection between _PC8_ and _BEC_ classification and between _PC8_ and _HS6_ classification. It forms the basis of some output of the main function, namely: _BEC_, _BEC\_agr_, _BEC\_basic\_class_ and _HS6plus_. The following table offers an overview of all provided variables.    
+  provides a data frame that contains all _PC8_ product codes and related _BEC_ and _HS6_ codes in a given time period. Therefore, this data serves as a connection between _PC8_ and _BEC_ classification and between _PC8_ and _HS6_ classification. It forms the basis of some output of the main function, namely: _BEC_, _BEC\_agr_, _SNA\_basic\_class_ and _HS6plus_. The following table offers an overview of all provided variables.    
   
   | Variable | Explanation|
   |:----|:--------------|
@@ -217,8 +236,8 @@ These functions go beyond the primary purpose of this package. The additional fu
       utilize_cn8() 
 may provide two data frames: 
 <ol type="a">
-  <li> A data frame that contains all changed _CN8_ product codes per firm per year. In more detail, this means how many products remained the same, were added, were dropped, how many products were produced by a certain firm in a given year, and how many products were produced in the year after. </li>
-  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _CN8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC\_agr_, _BEC\_basic\_class_).</li>
+  <li> A data frame that contains all changed _CN8_ product codes per firm per year. In more detail, this means how many products remained the same, were added, were dropped, how many products were produced by a certain firm in a given year, and how many products were produced in the year after. As a base of this computation CN8plus codes or HS6plus codes can be used.</li>
+  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _CN8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC\_agr_, _SNA\_basic\_class_).</li>
 </ol>
 The tables at the end of this section offer an overview of all provided variables.
       
@@ -229,8 +248,8 @@ The tables at the end of this section offer an overview of all provided variable
       utilize_pc8() 
 may provide two data frames: 
 <ol type="a">
-  <li> A data frame that contains all changed _PC8_ product codes per firm per year. In more detail, this means how many products remained the same, were added or dropped - the value of the same/added/dropped products - how many products were produced by a certain firm in a given year, and how many products were produced in the year after. </li>
-  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _PC8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC\_agr_, _BEC\_basic\_class_).</li>
+  <li> A data frame that contains all changed _PC8_ product codes per firm per year. In more detail, this means how many products remained the same, were added or dropped - the value of the same/added/dropped products - how many products were produced by a certain firm in a given year, and how many products were produced in the year after. As a base of this computation PC8plus codes or HS6plus codes can be used. </li>
+  <li>A data frame that is based on the entered firm data. The entered firm data data is extended by harmonized data (that is _PC8plus_, _flag_, _flagyear_, _HS6plus_, _BEC_, _BEC\_agr_, _SNA\_basic\_class_).</li>
 </ol>
 The tables at the end of this section offer an overview of all provided variables.
 
@@ -272,7 +291,7 @@ _Table that summarizes the output, described by the notation_ __b.__ _above:_
   |HS6plus | also adjusts for the change lists of HS6 |
   |BEC | provides the BEC classification on a high aggregated level (1 digit) |
   |BEC\_agr | provides the BEC classification on a less aggregated level (up to 3 digits) |
-  |BEC\_basic\_class | provides information if the code is classified as consumption, capital or intermediate good in BEC |
+  |SNA\_basic\_class | provides information if the code is classified as consumption, capital or intermediate good in SNA |
 
   <a id="iddatasets"></a>
   

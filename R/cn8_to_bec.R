@@ -5,7 +5,7 @@
 #############################################################
 
 #' @importFrom stats na.omit setNames
-#' @importFrom utils read.csv read.table
+#' @importFrom utils read.csv2
 #' @export cn8_to_bec
 
 cn8_to_bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
@@ -63,23 +63,57 @@ cn8_to_bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
 
   # get all changes between HS6 and BEC as separate dataframes
   filenames <- list.files(paste0(system.file("extdata", package = "harmonizer"), "/HS6toBEC"), pattern="*.csv", full.names=TRUE)
-  correspondence_lists <- lapply(filenames, read.csv)
+  # check for which years files exist
+  available_years <- substr(filenames,(nchar(filenames)+1)-15,nchar(filenames))
+  available_years <- regmatches(available_years, gregexpr("[[:digit:]]+", available_years))
+  available_years <- unlist(available_years)
+  # select only needed HStoBEC files
+  needed_files <- paste0("HS", b:e, "toBEC")
+  needed_files <- sapply(needed_files, FUN = function(x) {length(grep(x, filenames)) > 0})
+  needed_files <- names(needed_files)[needed_files]
+  needed_files <- sapply(needed_files, FUN = function(x) {grep(x, filenames)})
+  # at least one file has to be selected
+  # workaround if b > max(available_years) or e < min(available_years) or in between
+  if(length(needed_files) == 0) {
+    if(e < min(available_years)) {
+      needed_files <- 1
+    } else if(b > max(available_years)) {
+      needed_files <- length(filenames)
+    } else {
+      available_years <- as.integer(available_years)
+      needed_files <- available_years > b & available_years > e
+      needed_files <- unique(c(which(needed_files) - 1, which(needed_files)))
+    }
+  }
+
+  # check if only Rev. 5 of BEC, that is year >= 2012 is needed
+  # if so reduce to all files >= 2012
+  if (any(as.integer(available_years[needed_files]) >= 2012) & e >= 2012) {
+    needed_files <- needed_files[as.integer(available_years[needed_files]) >= 2012]
+  } else if (any(as.integer(available_years[needed_files]) >= 2012) & e < 2012) {
+    needed_files <- needed_files[as.integer(available_years[needed_files]) < 2012]
+  }
+
+  correspondence_lists <- lapply(filenames[needed_files], read.csv2)
   for(i in 1:length(correspondence_lists)) {
     # unlist as dataframe
-    assign(paste0("correspondence_", i), as.data.frame(correspondence_lists[i], responseName = c("HS6", "BEC")))
-    # split up in two cols
-    assign(paste0("correspondence_", i),
-           data.frame(do.call("rbind", strsplit(as.character(eval(parse(text = paste0("correspondence_", i, "[[1]]")))),
-                                                ";", fixed = TRUE))), )
-    # rename cols
-    assign(paste0("correspondence_", i), setNames(eval(parse(text = paste0("correspondence_", i))), c("HS", "BEC")))
+    assign(paste0("correspondence_", i), as.data.frame(correspondence_lists[i]))
+    # # split up in two cols
+    # assign(paste0("correspondence_", i),
+    #        data.frame(do.call("rbind", strsplit(as.character(eval(parse(text = paste0("correspondence_", i, "[[1]]")))),
+    #                                             ";", fixed = TRUE))), )
+    # # rename cols
+    # assign(paste0("correspondence_", i), setNames(eval(parse(text = paste0("correspondence_", i))), c("HS", "BEC")))
   }
 
   # create one dataframe which contains all unique HS6 codes
   assign("correspondence_BEC", eval(parse(text = "correspondence_1")))
-  for (i in 2:length(correspondence_lists)) {
-    correspondence_BEC <- rbind(correspondence_BEC, eval(parse(text = paste0("correspondence_", i))))
+  if(exists("correspondence_2")) {
+    for (i in 2:length(correspondence_lists)) {
+      correspondence_BEC <- rbind(correspondence_BEC, eval(parse(text = paste0("correspondence_", i))))
+    }
   }
+
 
   correspondence_BEC$HS <- gsub(".", "", correspondence_BEC$HS, fixed = TRUE)
   correspondence_BEC$HS <- gsub(" ", "", correspondence_BEC$HS, fixed = TRUE)
