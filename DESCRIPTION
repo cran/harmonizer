@@ -1,8 +1,8 @@
 Package: harmonizer
 Type: Package
-Date: 2022-05-22
+Date: 2022-11-23
 Title: Harmonizing CN8 and PC8 Product Codes
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
     person("Christoph", "Baumgartner", email = "Christoph.Baumgartner@uibk.ac.at", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0002-2681-071X")),	
@@ -29,6 +29,6 @@ RoxygenNote: 7.2.0
 Suggests: rmarkdown, knitr
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-05-23 14:53:34 UTC; Baumg
+Packaged: 2022-11-23 14:42:56 UTC; Baumg
 Repository: CRAN
-Date/Publication: 2022-05-23 15:20:02 UTC
+Date/Publication: 2022-11-23 14:50:02 UTC

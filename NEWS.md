@@ -1,3 +1,7 @@
+# Update to version 0.3.1
+
+* fixed a bug in function history_martrix_cn8() that crashed this function and harmonize_cn8()
+
 # Update to version 0.3.0
 
 * harmonize_cn8() and harmonize_pc8() have a new argument "harmonize.to", which allows the user to define if harmonization is done towards the first or last year of the period of interest.

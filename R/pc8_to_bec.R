@@ -23,10 +23,10 @@ pc8_to_bec <- function(b, e, historymatrix = NULL, progress = TRUE) {
     stop(paste0("The entered last year of intrest (e) has to be a single integer value, which has to be smaller than ", as.integer(substr(date(), start = 21, stop = 24)), ". Please correct."))
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", b, ".rds"))) {
-    stop("There is no data avilable for the first year of intrest (b). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the first year of intrest (b). Consider changing the time periode, or alter data (-> get_data_directory()).")
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", e, ".rds"))) {
-    stop("There is no data avilable for the first year of intrest (e). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the first year of intrest (e). Consider changing the time periode, or alter data (-> get_data_directory()).")
   }
   #########################
   ### history matrix check

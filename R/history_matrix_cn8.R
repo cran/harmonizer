@@ -34,13 +34,13 @@ history_matrix_cn8 <- function(b, e, c1 = 1988, c2 = 2022, progress = TRUE) {
     stop(paste0("The entered last year of year of the concordance list (c2) has to be a single integer value, which has to be smaller than ", as.integer(substr(date(), start = 21, stop = 24)), ". Please correct."))
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/CN8/CN8_", b, ".rds"))) {
-    stop("There is no data avilable for the first year of interest (b). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the first year of interest (b). Consider changing the time periode, or alter data (-> get_data_directory()).")
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/CN8/CN8_", e, ".rds"))) {
-    stop("There is no data avilable for the last year of interest (e). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the last year of interest (e). Consider changing the time periode, or alter data (-> get_data_directory()).")
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/CN8/CN8_concordances_", c1,"_", c2, ".csv"))) {
-    stop("There is no data avilable for the chosen years for the concordance list (c1, c2). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the chosen years for the concordance list (c1, c2). Consider changing the time periode, or alter data (-> get_data_directory()).")
   }
 
   ###############################################################################

@@ -18,7 +18,7 @@ example_pc8_cn8_concordance <- readRDS(paste0(file_path, "/PC8/PC8_CN8_2010.rds"
 head(example_cn8)
 
 ## ----comment='', echo=FALSE---------------------------------------------------
-cat(readLines(paste0(file_path, "/CN8/CN8_concordances_1988_2020.csv"), n = 6, encoding = "UTF-8"), sep = '\n')
+cat(readLines(paste0(file_path, "/CN8/CN8_concordances_1988_2022.csv"), n = 6, encoding = "UTF-8"), sep = '\n')
 
 ## ---- echo = FALSE------------------------------------------------------------
 	  head(example_pc8)

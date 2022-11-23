@@ -21,16 +21,16 @@ history_matrix_pc8 <- function(b, e, progress = TRUE) {
     stop(paste0("The entered last year of interest (e) has to be a single integer value, which has to be smaller than ", as.integer(substr(date(), start = 21, stop = 24)), ". Please correct."))
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", b, ".rds"))) {
-    stop("There is no data avilable for the first year of interest (b). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the first year of interest (b). Consider changing the time periode, or alter data (-> get_data_directory()).")
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", e, ".rds"))) {
-    stop("There is no data avilable for the first year of interest (e). Consider changing the time periode, or alter data (-> get.data.directory()).")
+    stop("There is no data avilable for the first year of interest (e). Consider changing the time periode, or alter data (-> get_data_directory()).")
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", e - 1, "_", e, ".rds"))) {
-    stop("There is no data avilable for the concordance between the last year of interest (e) and the year before. Consider changing the time periode, or add data (-> get.data.directory()).")
+    stop("There is no data avilable for the concordance between the last year of interest (e) and the year before. Consider changing the time periode, or add data (-> get_data_directory()).")
   }
   if (!file.exists(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", b, "_", b + 1, ".rds"))) {
-    stop("There is no data avilable for the concordance between the first year of interest (b) and the year after. Consider changing the time periode, or add data (-> get.data.directory()).")
+    stop("There is no data avilable for the concordance between the first year of interest (b) and the year after. Consider changing the time periode, or add data (-> get_data_directory()).")
   }
 
   ###############################################################################
