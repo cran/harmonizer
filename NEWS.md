@@ -1,3 +1,11 @@
+# Update to version 0.3.2
+
+* added more information in the varaible "flag"; flags can now be a integer from 0-3; information is according to help-files and vignette
+
+* code changes that appear only in the changelist but are not systemic otherwise are now considered as well
+
+* harmonize_cn8() and harmonize_pc8() now show expected calculation time
+
 # Update to version 0.3.1
 
 * fixed a bug in function history_martrix_cn8() that crashed this function and harmonize_cn8()

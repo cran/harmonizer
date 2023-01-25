@@ -32,26 +32,26 @@ document.addEventListener('DOMContentLoaded', function(e) {
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 
 <style type="text/css">
-  p.abstract{
-    text-align: center;
-    font-weight: bold;
-  }
-  div.abstract{
-    margin: auto;
-    width: 90%;
-  }
+p.abstract{
+text-align: center;
+font-weight: bold;
+}
+div.abstract{
+margin: auto;
+width: 90%;
+}
 </style>
 
 
@@ -265,23 +265,22 @@ codes.
 
 
 <style type="text/css">
-
 h1.title {
-  font-size: 38px;
-  color: Black;
-  text-align: center;
+font-size: 38px;
+color: Black;
+text-align: center;
 }
-h4.author { /* Header 4 - and the author and data headers use this too  */
-    font-size: 18px;
-  font-family: "Times New Roman", Times, serif;
-  color: Black;
-  text-align: center;
+h4.author { 
+font-size: 18px;
+font-family: "Times New Roman", Times, serif;
+color: Black;
+text-align: center;
 }
-h4.date { /* Header 4 - and the author and data headers use this too  */
-  font-size: 18px;
-  font-family: "Times New Roman", Times, serif;
-  color: DarkBlue;
-  text-align: center;
+h4.date { 
+font-size: 18px;
+font-family: "Times New Roman", Times, serif;
+color: DarkBlue;
+text-align: center;
 }
 </style>
 <p>This package provides several functions to harmonize <em>CN8</em>
@@ -363,12 +362,16 @@ connections among codes need to be documented. This means if a code
 split or merged into several codes for example, this codes are grouped
 together from now on (consecutively referred to as <em>family</em>). If
 a mixture of changes, e.g. a code split and remained the same in terms
-of notation in the same year, this information is stored in a binary
-variable ‘<em>flag</em>’. However, these codes with flag-variables being
-1, are also part of a certain family. Summarizing this means, if one
-takes all this information into account, one reaches the professed goal
-of <em>CN8plus</em>, which therefore includes all codes that did not
-change and all families.</p>
+of notation in the same year, this information is stored in the variable
+‘<em>flag</em>’. However, these codes with flag-variables being 1, are
+also part of a certain family. Summarizing this means, if one takes all
+this information into account, one reaches the professed goal of
+<em>CN8plus</em>, which therefore includes all codes that did not change
+and all families. Furthermore, the varaibale <em>flag</em> can be 2 or
+3. The variable <em>flag</em> being equal to 2, means that this code is
+either new or was dropped during the periode of interest. If it is 3,
+the code had at least one simple change, but is not associated with a
+family.</p>
 <p>The additional classification systems, are based on <em>CN8plus</em>
 (or <em>PC8plus</em> respectively). Since CN8 and HS6 are closely
 connected (HS6 are the first six digits of CN8), this transformation is
@@ -395,7 +398,7 @@ the added columns.</p>
 and 2007. For 2012 and 2017, there exists a concordance between HS6 and
 BEC Rev. 5. Therefore, we provide BEC codes from Rev. 4 until 2011 and
 BEC codes from Rev. 5 thereafter. Moreover, BEC codes can be classified
-into three basic classes defined by the <a href="https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Building_the_System_of_National_Accounts_-_basic_concepts&amp;oldid=452465">System
+into three classes defined by the <a href="https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Building_the_System_of_National_Accounts_-_basic_concepts&amp;oldid=452465">System
 of National Accounts</a> (SNA), which focus on the end-use of the
 product.</p>
 <p><a id="idmainfunctions"></a></p>
@@ -449,20 +452,21 @@ level (1 digit)</td>
 level (up to 3 digits)</td>
 </tr>
 <tr class="even">
-<td align="left">SNA_basic_class</td>
+<td align="left">SNA</td>
 <td align="left">provides information if the code is classified as
 consumption, capital or intermediate good in SNA</td>
 </tr>
 <tr class="odd">
 <td align="left">flag</td>
-<td align="left">either 0 or 1; 1 indicates that this code remained the
-same in notation over the whole time period but was split or merged in
-addition</td>
+<td align="left">integer from 0 to 3; 1 indicates that this code
+remained the same in notation over the whole time period but was split
+or merged in addition; 2 indicates that this code is either new or was
+dropped during the period of interest; 3 indicates the code had at least
+one simple change, but is not associated with a family</td>
 </tr>
 <tr class="even">
 <td align="left">flagyear</td>
-<td align="left">indicates the first year in which the flag was set to
-1</td>
+<td align="left">indicates the first year in which the flag was set</td>
 </tr>
 </tbody>
 </table>
@@ -516,20 +520,21 @@ level (1 digit)</td>
 level (up to 3 digits)</td>
 </tr>
 <tr class="even">
-<td align="left">SNA_basic_class</td>
+<td align="left">SNA</td>
 <td align="left">provides information if the code is classified as
-consumption, capital or intermediate good in BEC</td>
+consumption, capital or intermediate good in SNA</td>
 </tr>
 <tr class="odd">
 <td align="left">flag</td>
-<td align="left">either 0 or 1; 1 indicates that this code remained the
-same in notation over the whole time period but was split or merged in
-addition</td>
+<td align="left">integer from 0 to 3; 1 indicates that this code
+remained the same in notation over the whole time period but was split
+or merged in addition; 2 indicates that this code is either new or was
+dropped during the period of interest; 3 indicates the code had at least
+one simple change, but is not associated with a family</td>
 </tr>
 <tr class="even">
 <td align="left">flagyear</td>
-<td align="left">indicates the first year in which the flag was set to
-1</td>
+<td align="left">indicates the first year in which the flag was set</td>
 </tr>
 </tbody>
 </table>
@@ -566,14 +571,14 @@ all provided variables.</p>
 </tr>
 <tr class="even">
 <td align="left">flag</td>
-<td align="left">either 0 or 1; 1 indicates that this code remained the
-same in notation over the whole time period but was split or merged in
-addition</td>
+<td align="left">integer from 0 to 2; 1 indicates that this code
+remained the same in notation over the whole time period but was split
+or merged in addition; 2 indicates that this code is either new or was
+dropped during the period of interest</td>
 </tr>
 <tr class="odd">
 <td align="left">flagyear</td>
-<td align="left">indicates the first year in which the flag was set to
-1</td>
+<td align="left">indicates the first year in which the flag was set</td>
 </tr>
 </tbody>
 </table>
@@ -605,14 +610,14 @@ all provided variables.</p>
 </tr>
 <tr class="even">
 <td align="left">flag</td>
-<td align="left">either 0 or 1; 1 indicates that this code remained the
-same in notation over the whole time period but was split or merged in
-addition</td>
+<td align="left">integer from 0 to 3; 1 indicates that this code
+remained the same in notation over the whole time period but was split
+or merged in addition; 2 indicates that this code is either new or was
+dropped during the period of interest</td>
 </tr>
 <tr class="odd">
 <td align="left">flagyear</td>
-<td align="left">indicates the first year in which the flag was set to
-1</td>
+<td align="left">indicates the first year in which the flag was set</td>
 </tr>
 </tbody>
 </table>
@@ -626,7 +631,7 @@ and related <em>BEC</em> and <em>HS6</em> codes in a given time period.
 Therefore, this data serves as a connection between <em>CN8</em> and
 <em>BEC</em> classification and between <em>CN8</em> and <em>HS6</em>
 classification. It forms the basis of some output of the main function,
-namely: <em>BEC</em>, <em>BEC_agr</em>, <em>SNA_basic_class</em> and
+namely: <em>BEC</em>, <em>BEC_agr</em>, <em>SNA</em> and
 <em>HS6plus</em>. The following table offers an overview of all provided
 variables.</p>
 <table>
@@ -672,7 +677,7 @@ and related <em>BEC</em> and <em>HS6</em> codes in a given time period.
 Therefore, this data serves as a connection between <em>PC8</em> and
 <em>BEC</em> classification and between <em>PC8</em> and <em>HS6</em>
 classification. It forms the basis of some output of the main function,
-namely: <em>BEC</em>, <em>BEC_agr</em>, <em>SNA_basic_class</em> and
+namely: <em>BEC</em>, <em>BEC_agr</em>, <em>SNA</em> and
 <em>HS6plus</em>. The following table offers an overview of all provided
 variables.</p>
 <table>
@@ -785,7 +790,7 @@ can be used.
 A data frame that is based on the entered firm data. The entered firm
 data data is extended by harmonized data (that is <em>CN8plus</em>,
 <em>flag</em>, <em>flagyear</em>, <em>HS6plus</em>, <em>BEC</em>,
-<em>BEC_agr</em>, <em>SNA_basic_class</em>).
+<em>BEC_agr</em>, <em>SNA</em>).
 </li>
 </ol>
 <p>The tables at the end of this section offer an overview of all
@@ -808,7 +813,7 @@ of this computation PC8plus codes or HS6plus codes can be used.
 A data frame that is based on the entered firm data. The entered firm
 data data is extended by harmonized data (that is <em>PC8plus</em>,
 <em>flag</em>, <em>flagyear</em>, <em>HS6plus</em>, <em>BEC</em>,
-<em>BEC_agr</em>, <em>SNA_basic_class</em>).
+<em>BEC_agr</em>, <em>SNA</em>).
 </li>
 </ol>
 <p>The tables at the end of this section offer an overview of all
@@ -948,9 +953,11 @@ the time period</td>
 </tr>
 <tr class="odd">
 <td align="left">flag</td>
-<td align="left">either 0 or 1; 1 indicates that this code remained the
-same in notation over the whole time period but was split or merged in
-addition</td>
+<td align="left">integer from 0 to 3; 1 indicates that this code
+remained the same in notation over the whole time period but was split
+or merged in addition; 2 indicates that this code is either new or was
+dropped during the period of interest; 3 indicates the code had at least
+one simple change, but is not associated with a family</td>
 </tr>
 <tr class="even">
 <td align="left">HS6</td>
@@ -972,7 +979,7 @@ level (1 digit)</td>
 level (up to 3 digits)</td>
 </tr>
 <tr class="even">
-<td align="left">SNA_basic_class</td>
+<td align="left">SNA</td>
 <td align="left">provides information if the code is classified as
 consumption, capital or intermediate good in SNA</td>
 </tr>

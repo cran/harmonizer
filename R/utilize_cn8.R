@@ -110,7 +110,7 @@ utilize_cn8 <- function(b, e, firm_data, harmonized_data = NULL,
 
   temp1 <- subset(CN8_harm, select = c("CN8plus", "flag","flagyear",
                                        "HS6plus", "BEC",
-                                       "BEC_agr", "SNA_basic_class"))
+                                       "BEC_agr", "SNA"))
   # merge firm data with harmonized data
   get_harm <- function(x) {
     ifelse(length(which(current_df == x)) > 0,
@@ -130,7 +130,7 @@ utilize_cn8 <- function(b, e, firm_data, harmonized_data = NULL,
   firm_data$HS6plus <- unlist(firm_data_list)[unlistindex[4,]]
   firm_data$BEC <- unlist(firm_data_list)[unlistindex[5,]]
   firm_data$BEC_agr <- unlist(firm_data_list)[unlistindex[6,]]
-  firm_data$SNA_basic_class <- unlist(firm_data_list)[unlistindex[7,]]
+  firm_data$SNA <- unlist(firm_data_list)[unlistindex[7,]]
 
   ### define output
   if (output == "merged.firm.data"){

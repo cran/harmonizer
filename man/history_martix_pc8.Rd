@@ -19,13 +19,13 @@ A data frame that contains all PC8 product codes and their history over time for
 \tabular{ll}{
 Variable	\tab Explanation \cr
 \code{PC8_xxxx}	\tab character; a specific PC8 code in a given year \cr
-\code{flag} \tab	numeric; either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition \cr
-\code{flagyear}	\tab numeric; indicates the first year in which the flag was set to 1
+\code{flag} \tab	numeric; integer from 0 to 3; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition; 2 indicates that this code is either new or was dropped during the period of interest \cr
+\code{flagyear}	\tab numeric; indicates the first year in which the flag was set
 }
 }
 
 \examples{
 \donttest{
-history_matrix_pc8(b = 2008, e = 2010)
+history <-  history_matrix_pc8(b = 2008, e = 2010)
 }
 }

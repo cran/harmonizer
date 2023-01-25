@@ -29,6 +29,6 @@ Variable \tab	Explanation \cr
 
 \examples{
 \donttest{
-pc8_to_bec(b = 2008, e = 2010)
+pc8_bec <- pc8_to_bec(b = 2008, e = 2010)
 }
 }

@@ -60,12 +60,17 @@ history_matrix_pc8 <- function(b, e, progress = TRUE) {
            readRDS(paste0(system.file("extdata", package = "harmonizer"), "/PC8/PC8_", b + i, "_", b + i + 1, ".rds")))
     assign("temp", eval(parse(text = paste0("PC8_", b + i, "_", b + i + 1))))
     # all changed product codes
-    temp1 <- temp[temp[, 1] != temp[, 2], ]
+    temp1 <- na.omit(temp)
+    temp2 <- temp1[temp1[, 1] != temp1[, 2], ]
     # plus new or dropped product codes -> concordance list
-    temp2 <- rbind(temp1, temp[is.na(temp[, 1]) | is.na(temp[, 2]), ])
-    assign(paste0("PC8_", b + i, "_", b + i + 1), temp2)
-    rm(temp, temp1, temp2)
+    temp3 <- rbind(temp1, temp[is.na(temp[, 1]) | is.na(temp[, 2]), ])
+    # Remove all white spaces
+    temp3$old <- replace(temp3$old, grepl("^\\s*$", temp3$old) == TRUE, NA)
+    temp3$new <- replace(temp3$new, grepl("^\\s*$", temp3$new) == TRUE, NA)
+    assign(paste0("PC8_", b + i, "_", b + i + 1), temp3)
+    rm(temp, temp1, temp2, temp3)
   }
+
 
   ###############################################################################
   ### main function
@@ -186,9 +191,24 @@ history_matrix_pc8 <- function(b, e, progress = TRUE) {
     PC8_over_time <- rbind(PC8_over_time, multiple_codes, make.row.names = FALSE)
 
     # Case D: add codes which were created in t + 1
+    # two possibilities to create new codes:  1 - exists in all codes list in t + 1
+    #                                         2 - created only according to change-list
     # and fill all previous years with NA
+    # 1
     assign(paste0("PC8f_", b + j + 1), next_year[!next_year[[1]] %in%  PC8_over_time[[j + 2]], 1])
     created_codes_df <- as.data.frame(eval(parse(text = paste0("PC8f_", b + j + 1))))
+    current_changelist <- eval(parse(text = paste0("PC8_", b + j, "_", b + j + 1)))
+    colnames(created_codes_df)[1] <- paste(b + j)
+    old_col <- which(colnames(current_changelist) == "old")
+    colnames(current_changelist)[old_col] <- paste(b + j)
+    # 2
+    #All new codes according to the change list
+    temp1 <- na.omit(current_changelist[is.na(current_changelist[[old_col]]), "new"])
+    temp <- data.frame(temp1[!(temp1 %in% PC8_over_time[[j + 2]])])
+    rm(temp1)
+
+    colnames(temp) <- paste(b + j)
+    created_codes_df <- rbind(created_codes_df, temp)
     colnames(created_codes_df)[1] <- paste0("PC8_", b + j + 1)
     for (r in 1:(j + 1)) {
       assign(paste0("PC8f_", b + r - 1), rep(NA, times = nrow(created_codes_df)))
@@ -215,41 +235,258 @@ history_matrix_pc8 <- function(b, e, progress = TRUE) {
   ### add variable "flag" & "flag_year"
   ###############################################################################
 
+  if (progress) {
+    print(paste0("Work in progress... Part 2/", mod_part,": 0%"))
+  }
+
   # flag == 1 indicates that this code did not change in terms of PC8 notation
   # but was split or merged at least once in the time record
   # flag_year indicates the year this split/merge appeared
+  # flag == 2 indicates that this code is new or was dropped
 
   PC8_over_time$flag <- rep(0, times = nrow(PC8_over_time))
   PC8_over_time$flagyear <- rep(NA, times = nrow(PC8_over_time))
 
+  ### flag == 1
   # j indicates the loop variable over the years (starting at t = 0)
   # i indicates the current row of the dataframe
 
-  j <- 0
-  while (j <= (numb_years)) {
+  # get all rows where first and last year codes do not differ
+  # flag_rows_d <- which(PC8_over_time[[1]] == PC8_over_time[[numb_years + 1]])
+  flag_rows_d <- apply(PC8_over_time[1:(numb_years + 1)], 1, function(x) all(x[1] == x))
+  names(flag_rows_d) <- NULL
+  flag_rows_d <- which(flag_rows_d)
+  # get all rows where codes appear multiple times
+  flag_rows_m <- apply(PC8_over_time[1:(numb_years + 1)], 2, function(x) unique(c(which(duplicated(x)), which(duplicated(x, fromLast = TRUE)))))
+  flag_rows_m <- unique(unlist(flag_rows_m))
+  # check for which rows both conditions hold
+  flag_rows <- intersect(flag_rows_m, flag_rows_d)
 
-    multiple <- na.omit(PC8_over_time[, j + 1])
-    multiple <- multiple[duplicated(multiple)] # Which codes are more than once?
-    tplusone_codes <- PC8_over_time[[j + 2]]  # (j+2)th col
-
-    for (i in 1:nrow(PC8_over_time)) {
-      current_code <- PC8_over_time[i, j + 1]
-      # Two arguments must hold in order to set flag == 1
-      # 1) the code has to appear more than once in the current year
-      # 2) the code has to remain (in terms of notation) the same on the whole time period
-
-      if (current_code %in% multiple &
-          all(apply(PC8_over_time[i, 1:(numb_years + 1)], 2, function(x) paste(PC8_over_time[i, 1]) %in% x))) {
-        PC8_over_time$flag[i] <- 1
-        if (is.na(PC8_over_time$flagyear[i])) {PC8_over_time$flagyear[i] <- b + j}
+  # only continue if any exist
+  if(length(flag_rows) > 0) {
+    # set flag == 1
+    PC8_over_time$flag[flag_rows] <- 1
+    ## find flag years
+    # distinguish between merges and splits
+    # splits have to appear more than once in the first year
+    multiple_rows1 <- unique(c(which(duplicated(PC8_over_time[, 1])),
+                               which(duplicated(PC8_over_time[, 1], fromLast = TRUE))))
+    # splits are not allowed to appear than once in the last year
+    multiple_rows2 <- unique(intersect(which(!duplicated(PC8_over_time[, (numb_years + 1)])),
+                                       which(!duplicated(PC8_over_time[, (numb_years + 1)], fromLast = TRUE))))
+    multiple_rows <- intersect(multiple_rows1, multiple_rows2)
+    # merges
+    merges <- PC8_over_time[setdiff(flag_rows, multiple_rows), 1]
+    if(length(merges) > 0) {
+      # get all rows with the merged codes
+      for(i in 1:length(merges)) {
+        row_nbr <- 1
+        j <- 0
+        # for merges do it as long as codes differ
+        while(row_nbr == 1) {
+          j <- j + 1
+          row_nbr <- nrow(PC8_over_time[which(merges[i] == PC8_over_time[[j]] & merges[i] == PC8_over_time[[numb_years + 1]]), ])
+        }
+        PC8_over_time$flagyear[setdiff(flag_rows, multiple_rows)[i]] <- as.numeric(substr(colnames(PC8_over_time[j]), start = 5, stop = 8))
       }
     }
-
-    if (progress) {
-      print(paste0("Work in progress... Part 2/", mod_part,": ", round(j/numb_years, 3) * 100, "%"))
+    # splits
+    splits <- PC8_over_time[intersect(flag_rows, multiple_rows), 1]
+    if(length(splits) > 0) {
+      # get all rows with the split codes
+      for(i in 1:length(splits)) {
+        row_nbr <- 2
+        j <- 0
+        # for splits do it as long as codes differ no longer
+        while(row_nbr != 1) {
+          j <- j + 1
+          row_nbr <- nrow(PC8_over_time[which(splits[i] == PC8_over_time[[j]] & splits[i] == PC8_over_time[[1]]), ])
+        }
+        PC8_over_time$flagyear[intersect(flag_rows, multiple_rows)[i]] <- as.numeric(substr(colnames(PC8_over_time[j]), start = 5, stop = 8))
+      }
     }
-    j <- j + 1
   }
+
+
+  if (progress) {
+    print(paste0("Work in progress... Part 2/", mod_part,": 50%"))
+  }
+
+  ### flag == 2
+
+  ## find all history cols
+  hist_cols <- 1:(numb_years + 1)
+  ## find any NA in the history cols
+  na_rows <- apply(PC8_over_time[, hist_cols], 1, anyNA)
+  na_rows_new <- is.na(PC8_over_time[[1]])
+  na_rows_dropped <- is.na(PC8_over_time[[(numb_years + 1)]])
+  ## only continue if any NAs exist
+  if(any(na_rows)) {
+    ## set flag == 2
+    PC8_over_time$flag[na_rows] <- 2
+    ## find flag years
+    flag_cols_new <- !apply(PC8_over_time[na_rows_new, hist_cols], 2, is.na)
+    flag_cols_dropped <- apply(PC8_over_time[na_rows_dropped, hist_cols], 2, is.na)
+    # check how many NAs there are
+    # 8 cases:
+    # I:    multiple drops    and     multiple news
+    # II:   multiple drops    and     one new
+    # III:  one drop          and     multiple news
+    # IV:   one drop          and     one new
+    # V:    one drop          and     no new
+    # VI:   no drop           and     one new
+    # VII:  multiple drops    and     no new
+    # VIII: no drop           and     multiple new
+
+    # case I
+    if(length(flag_cols_dropped) > (numb_years + 1) & length(flag_cols_new) > (numb_years + 1)) {
+      # find only cols which do not have a NA
+      flag_cols_new <- apply(flag_cols_new, 1, which, simplify = FALSE)
+      flag_cols_dropped <- apply(flag_cols_dropped, 1, which, simplify = FALSE)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_new <- lapply(flag_cols_new, min)
+      flag_cols_dropped <- lapply(flag_cols_dropped, min)
+      # transform list into vector
+      flag_cols_new <- unlist(flag_cols_new)
+      flag_cols_dropped <- unlist(flag_cols_dropped)
+      # correct with - 1, since the finds first NA, i.e. the code dropped in the previous year
+      flag_cols_dropped <- unlist(flag_cols_dropped) - 1
+
+      # get colnames and therefore years
+      flag_cols_new <- as.numeric(substr(colnames(PC8_over_time[flag_cols_new]), start = 5, stop = 8))
+      flag_cols_dropped <- as.numeric(substr(colnames(PC8_over_time[flag_cols_dropped]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_new] <- flag_cols_new
+      PC8_over_time$flagyear[na_rows_dropped] <- flag_cols_dropped
+    }
+
+    # case II
+    else if(length(flag_cols_dropped) > (numb_years + 1) & length(flag_cols_new) == (numb_years + 1)) {
+      # find only cols which do not have a NA
+      flag_cols_new <- which(flag_cols_new)
+      flag_cols_dropped <- apply(flag_cols_dropped, 1, which, simplify = FALSE)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_new <- flag_cols_new[1]
+      flag_cols_dropped <- lapply(flag_cols_dropped, min)
+      # transform list into vector
+      flag_cols_dropped <- unlist(flag_cols_dropped)
+      # correct with - 1, since the finds first NA, i.e. the code dropped in the previous year
+      flag_cols_dropped <- unlist(flag_cols_dropped) - 1
+
+      # get colnames and therefore years
+      flag_cols_new <- as.numeric(substr(colnames(PC8_over_time[flag_cols_new]), start = 5, stop = 8))
+      flag_cols_dropped <- as.numeric(substr(colnames(PC8_over_time[flag_cols_dropped]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_new] <- flag_cols_new
+      PC8_over_time$flagyear[na_rows_dropped] <- flag_cols_dropped
+    }
+
+    # case III
+    else if(length(flag_cols_dropped) == (numb_years + 1) & length(flag_cols_new) > (numb_years + 1)) {
+      # find only cols which do not have a NA
+      flag_cols_dropped <- which(flag_cols_dropped)
+      flag_cols_new <- apply(flag_cols_new, 1, which, simplify = FALSE)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_dropped <- flag_cols_dropped[1]
+      flag_cols_new <- lapply(flag_cols_new, min)
+      # transform list into vector
+      flag_cols_new <- unlist(flag_cols_new)
+      # correct with - 1, since the finds first NA, i.e. the code dropped in the previous year
+      flag_cols_dropped <- flag_cols_dropped - 1
+
+      # get colnames and therefore years
+      flag_cols_new <- as.numeric(substr(colnames(PC8_over_time[flag_cols_new]), start = 5, stop = 8))
+      flag_cols_dropped <- as.numeric(substr(colnames(PC8_over_time[flag_cols_dropped]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_new] <- flag_cols_new
+      PC8_over_time$flagyear[na_rows_dropped] <- flag_cols_dropped
+    }
+
+    # case IV
+    else if(length(flag_cols_dropped) == (numb_years + 1) & length(flag_cols_new) == (numb_years + 1)) {
+      # find only cols which do not have a NA
+      flag_cols_dropped <- which(flag_cols_dropped)
+      flag_cols_new <- which(flag_cols_new)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_dropped <- flag_cols_dropped[1]
+      flag_cols_new <- flag_cols_new[1]
+      # correct with - 1, since the finds first NA, i.e. the code dropped in the previous year
+      flag_cols_dropped <- flag_cols_dropped - 1
+
+      # get colnames and therefore years
+      flag_cols_new <- as.numeric(substr(colnames(PC8_over_time[flag_cols_new]), start = 5, stop = 8))
+      flag_cols_dropped <- as.numeric(substr(colnames(PC8_over_time[flag_cols_dropped]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_new] <- flag_cols_new
+      PC8_over_time$flagyear[na_rows_dropped] <- flag_cols_dropped
+    }
+
+    # case IV
+    else if(length(flag_cols_dropped) == (numb_years + 1) & length(flag_cols_new) == 0) {
+      # find only cols which do not have a NA
+      flag_cols_dropped <- which(flag_cols_dropped)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_dropped <- flag_cols_dropped[1]
+      # correct with - 1, since the finds first NA, i.e. the code dropped in the previous year
+      flag_cols_dropped <- flag_cols_dropped - 1
+
+      # get colnames and therefore years
+      flag_cols_dropped <- as.numeric(substr(colnames(PC8_over_time[flag_cols_dropped]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_dropped] <- flag_cols_dropped
+    }
+
+    # case VI
+    else if(length(flag_cols_dropped) == 0 & length(flag_cols_new) == (numb_years + 1)) {
+      # find only cols which do not have a NA
+      flag_cols_new <- which(flag_cols_new)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_new <- flag_cols_new[1]
+
+      # get colnames and therefore years
+      flag_cols_new <- as.numeric(substr(colnames(PC8_over_time[flag_cols_new]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_new] <- flag_cols_new
+    }
+
+
+    # case VII
+    if(length(flag_cols_dropped) > (numb_years + 1) & length(flag_cols_new) == 0) {
+      # find only cols which do not have a NA
+      flag_cols_dropped <- apply(flag_cols_dropped, 1, which, simplify = FALSE)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_dropped <- lapply(flag_cols_dropped, min)
+      # transform list into vector
+      flag_cols_dropped <- unlist(flag_cols_dropped)
+      # correct with - 1, since the finds first NA, i.e. the code dropped in the previous year
+      flag_cols_dropped <- unlist(flag_cols_dropped) - 1
+
+      # get colnames and therefore years
+      flag_cols_dropped <- as.numeric(substr(colnames(PC8_over_time[flag_cols_dropped]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_dropped] <- flag_cols_dropped
+    }
+
+    # case VIII
+    if(length(flag_cols_dropped) == 0 & length(flag_cols_new) > (numb_years + 1)) {
+      # find only cols which do not have a NA
+      flag_cols_new <- apply(flag_cols_new, 1, which, simplify = FALSE)
+      # take only first element, i.e. first year where the code poped up
+      flag_cols_new <- lapply(flag_cols_new, min)
+      # transform list into vector
+      flag_cols_new <- unlist(flag_cols_new)
+
+      # get colnames and therefore years
+      flag_cols_new <- as.numeric(substr(colnames(PC8_over_time[flag_cols_new]), start = 5, stop = 8))
+      ## set flag years
+      PC8_over_time$flagyear[na_rows_new] <- flag_cols_new
+    }
+  }
+
+  if (progress) {
+    print(paste0("Work in progress... Part 2/", mod_part,": 100%"))
+  }
+
   return(PC8_over_time)
 }
 

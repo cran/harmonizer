@@ -33,15 +33,15 @@ Variable \tab	Explanation \cr
 \code{HS6plus}	\tab character; the harmonization code of HS6, which refers to the last/first year of the time period \cr
 \code{BEC}	\tab character; provides the BEC classification at a high aggregation level (1 digit) \cr
 \code{BEC_agr} \tab	character; provides the BEC classification at a lower aggregation level (up to 3 digits) \cr
-\code{SNA_basic_class} \tab	character; provides information if the code is classified as consumption, capital or intermediate good in BEC \cr
-\code{flag}	\tab numeric; either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition \cr
-\code{flagyear} \tab numeric;	indicates the first year in which the flag was set to 1
+\code{SNA} \tab	character; provides information if the code is classified as consumption, capital or intermediate good in BEC \cr
+\code{flag}	\tab numeric; integer from 0 to 3; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition; 2 indicates that this code is either new or was dropped during the period of interest; 3 indicates the code had at least one simple change, but is not associated with a family \cr
+\code{flagyear} \tab numeric;	indicates the first year in which the flag was set
 }
 }
 
 \examples{
 \donttest{
-harmonize_pc8(b = 2009, e = 2011)
+myharmonization <- harmonize_pc8(b = 2009, e = 2011)
 
 mydata <- history_matrix_pc8(b = 2015, e = 2017)
 myharmonization <- harmonize_pc8(b = 2015, e = 2017,

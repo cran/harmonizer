@@ -65,12 +65,13 @@ Variable	\tab	Explanation \cr
 \code{(value)}	\tab numeric; value of the corresponding product code (may be provided by user) \cr
 \code{...}	\tab character;	additional columns from original firm data (provided by user) \cr
 \code{PC8plus}	\tab character;	final harmonization, which refers to the last year of the time period \cr
-\code{flag}	\tab character;	either 0 or 1; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition \cr
+\code{flag}	\tab numeric;	integer from 0 to 3; 1 indicates that this code remained the same in notation over the whole time period but was split or merged in addition; 2 indicates that this code is either new or was dropped during the period of interest; 3 indicates the code had at least one simple change, but is not associated with a family \cr
+\code{flagyear} \tab numeric;	indicates the first year in which the flag was set \cr
 \code{HS6}	\tab character;	provides the HS6 classification of the PC8plus code \cr
 \code{HS6plus}	\tab character;	also adjusts for the change lists of HS6 \cr
 \code{BEC}	\tab character;	provides the BEC classification on a high aggregated level (1 digit) \cr
 \code{BEC_agr}	\tab character;	provides the BEC classification on a less aggregated level (up to 3 digits) \cr
-\code{SNA_basic_class}	\tab character;	provides information if the code is classified as consumption, capital or intermediate good in BEC
+\code{SNA}	\tab character;	provides information if the code is classified as consumption, capital or intermediate good in BEC
 }
 }
 
@@ -80,7 +81,7 @@ sampledata <- read.table(paste0(system.file("extdata", package = "harmonizer"),
                          "/sampledata/pc8sample.txt"), sep = ";",
                          header = TRUE , colClasses = "character")
 
-utilize_pc8(b = 2011, e = 2013, firm_data = sampledata)
+newdata <- utilize_pc8(b = 2011, e = 2013, firm_data = sampledata)
 
 newdata <- utilize_pc8(b = 2011, e = 2013, firm_data = sampledata,
                        output = "all")

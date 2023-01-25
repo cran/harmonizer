@@ -46,6 +46,30 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL, harmonize.to = "e",
   }
 
   #########################
+  ### check runtime
+  #########################
+
+  assign("runtime", readRDS(paste0(system.file("extdata", package = "harmonizer"), "/runtime/runtime_cn8_pc8.rds")))
+  expect_time <- runtime$time[runtime$functions == "harmonize_pc8" & runtime$start == b & runtime$end == e]
+  h <- as.integer(expect_time / 3600)
+  m <- round((expect_time %% 3600) / 60, 0)
+  if(m > 10) {  # round up to next 10 min
+    m <- round(m + 5, -1)
+  } else if(m == 0) {
+    m <- 1
+  }
+
+  if(length(h) > 0 & length(m) > 0) {
+    if(h > 0) {
+      print(paste0("This process may take up to ", h, " hours and ", m, " minute(s) (--> ~ ", Sys.time() + h * 3600 + m * 60, ")."))
+    } else  {
+    print(paste0("This process may take up to ", m, " minute(s) (--> ~ ", Sys.time() + h * 3600 + m * 60, ")."))
+    }
+  } else {
+    print("Expected calculation time unkown.")
+  }
+
+  #########################
   ### history matrix check
   #########################
   fcalls <- sys.nframe()
@@ -176,8 +200,8 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL, harmonize.to = "e",
           }
         }
         if (tied_codes[i] == "no_ties" & tied_codes[j] == "no_ties") {
-          tied_codes[j] <- paste0("f", i)
-          tied_codes[i] <- paste0("f", i)
+          tied_codes[j] <- paste0("f_", i)
+          tied_codes[i] <- paste0("f_", i)
         }
       }
     }
@@ -209,156 +233,159 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL, harmonize.to = "e",
   # HS6 harmonize
   PC8_over_time$HS6 <- as.character(PC8_over_time$HS6)
   PC8_over_time$HS6plus <- as.character(PC8_over_time$HS6)
-  HS6_temp <- PC8_over_time[PC8_over_time$family == 1, ]
+  if(all(PC8_over_time$family != 0)) {
+    HS6_temp <- PC8_over_time[PC8_over_time$family == 1, ]
 
-  # Find HS6 to PC8 and replace PC8 codes with HS6
-  for (i in 1:nbr_years){
-    # replace all NAs in PC8 codes with a "useless" string
-    # otherwise the apply function does not work properly
-    HS6_temp[, paste0("PC8_",years[i])][is.na(HS6_temp[, paste0("PC8_",years[i])])] <- "removed"
-    # find the corresponding HS6 codes
-    indexhs6 <- unlist(apply(as.matrix(paste0("\\b", HS6_temp[, paste0("PC8_",years[i])], "\\b")), 1, grep, x = PC8_to_BEC$PC8))
-    # find which PC8 codes have a replacement
-    indexpc8 <- HS6_temp[, paste0("PC8_", years[i])] %in% PC8_to_BEC$PC8
-    # replace PC8 with HS6 if possible
-    HS6_temp[indexpc8, paste0("PC8_", years[i])] <- PC8_to_BEC$HS6[indexhs6]
+    # Find HS6 to PC8 and replace PC8 codes with HS6
+    for (i in 1:nbr_years){
+      # replace all NAs in PC8 codes with a "useless" string
+      # otherwise the apply function does not work properly
+      HS6_temp[, paste0("PC8_",years[i])][is.na(HS6_temp[, paste0("PC8_",years[i])])] <- "removed"
+      # find the corresponding HS6 codes
+      indexhs6 <- unlist(apply(as.matrix(paste0("\\b", HS6_temp[, paste0("PC8_",years[i])], "\\b")), 1, grep, x = PC8_to_BEC$PC8))
+      # find which PC8 codes have a replacement
+      indexpc8 <- HS6_temp[, paste0("PC8_", years[i])] %in% PC8_to_BEC$PC8
+      # replace PC8 with HS6 if possible
+      HS6_temp[indexpc8, paste0("PC8_", years[i])] <- PC8_to_BEC$HS6[indexhs6]
+    }
+
+    fams <- unique(HS6_temp$PC8plus)
+
+    if (progress) {
+      print(paste0("Work in progress... Part ", mod_partb + 1,  "/" , mod_parte, ": 0%"))
+    }
+
+    # check if breaks are needed
+    if (any(idx_breaks)) {
+      for (i in 1:length(fams)) {
+        ### check consistency of each block
+        consistent <- vector(mode = "logical")
+        # nbr of blocks = breaks + 1
+        for (s in 1:(length(breaks[idx_breaks]) + 1)) {
+          if (length(breaks[idx_breaks]) == 1) {
+            # special case for only one break
+            early_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) < breaks[idx_breaks]
+            early_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][early_years]
+            late_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][!early_years]
+            block_1 <- as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], early_years_names])
+            block_2 <- as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], late_years_names])
+            if (length(unique(unlist(block_1))) == 1) {
+              consistent <- c(consistent, TRUE)
+            } else {
+              consistent <- c(consistent, FALSE)
+            }
+            if (length(unique(unlist(block_2))) == 1) {
+              consistent <- c(consistent, TRUE)
+            } else {
+              consistent <- c(consistent, FALSE)
+            }
+            break
+          } else {
+            # derive last block (> last break)
+            if (s == (length(breaks[idx_breaks]) + 1)) {
+              temp_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) >= breaks[idx_breaks][length(breaks[idx_breaks])] #breaks[length(breaks)]
+              temp_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][temp_years]
+              # get all codes in last "time block"
+              assign(paste0("block_", s), as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], temp_years_names]))
+
+            } else if (s == 1) { # First block
+              temp_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) < breaks[idx_breaks][s]
+              temp_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][temp_years]
+              # get all codes in one "time block"
+              assign(paste0("block_", s), as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], temp_years_names]))
+
+            } else { # Blocks in between
+              # for all other blocks but the last the following works
+              temp_years1 <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) < breaks[idx_breaks][s]
+              temp_years2 <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) >= breaks[idx_breaks][s - 1]# temp_years[temp_years >= breaks[idx_breaks][s - 1]]
+              temp_years <- temp_years1 & temp_years2
+              temp_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][temp_years]
+              # get all codes in one "time block"
+              assign(paste0("block_", s), as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], temp_years_names]))
+            }
+
+            # check if all codes in this block are the same
+            if (length(unique(unlist(eval(parse(text = paste0("block_", s)))))) == 1) {
+              consistent <- c(consistent, TRUE)
+            } else {
+              consistent <- c(consistent, FALSE)
+            }
+          }
+        }
+        ### check if all codes across all blocks remain the same
+        temp_blockvalue <- vector(mode = "character")
+        for (k in 1:(length(breaks[idx_breaks]) + 1)) {
+          temp_blockvalue <- c(temp_blockvalue, eval(parse(text = rep(paste0("block_", k, "[[1]][1]")))))
+        }
+        if (length(unique(temp_blockvalue)) == 1) {
+          equal <- TRUE
+        } else {
+          equal <- FALSE
+        }
+
+        ### check if the blocks are consistent and equal
+        if (all(consistent) & equal) {
+          HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(eval(parse(text = "block_1")))),
+                                                               times = nrow(eval(parse(text = "block_1"))))
+        } else if (all(consistent)) {
+          # check if the codes across the blocks differ
+          # but the changes are consistent with the change list
+          # loop over all correspondece lists
+          for (j in 1:sum(idx_breaks)) {
+            # n ... rownbr of related correspondence list where the code of block_j appears
+            # m ... rownbr of related correspondence list where the code of block_(j+1) appears
+            n <- which(eval(parse(text = paste0("block_", j, "[[1]][1]"))) == eval(parse(text = paste0("correspondence_", breaks[idx_breaks][j], "$old"))))
+            m <- which(eval(parse(text = paste0("block_", j + 1, "[[1]][1]"))) == eval(parse(text = paste0("correspondence_", breaks[idx_breaks][j], "$new"))))
+            # the code has to appear only once, otherwise no clear assignment can be done
+            if (length(n) == 1 & length(m) == 1) {
+              if ( m == n) {
+                HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(eval(parse(text = paste0("block_",
+                                                                                                            length(breaks[idx_breaks]) + 1))))),
+                                                                     times = nrow(eval(parse(text = paste0("block_",
+                                                                                                           length(breaks[idx_breaks]) + 1)))))
+              }
+            } else {
+              # if the changes are not consistent with the change list keep the old family
+              HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i],
+                                                                   times = nrow(eval(parse(text = paste0("block_",
+                                                                                                         length(breaks[idx_breaks]) + 1)))))
+            }
+          }
+        } else {
+          # if the changes are not consistent nor equal keep the old family
+          HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i],
+                                                               times = nrow(eval(parse(text = paste0("block_",
+                                                                                                     length(breaks[idx_breaks]) + 1)))))
+        }
+        if (progress) {
+          if (i %% 100 == 0) {
+            print(paste0("Work in progress... Part ", mod_partb + 1,  "/" , mod_parte, ": ", round(i / length(fams), 3) * 100, "%"))
+          }
+        }
+      }
+    } else {
+      # case if no changes of HS6 happened in the observed time period
+      year_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))]
+      for (i in 1:length(fams)) {
+        block <- as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], year_names])
+        # check the code whether it changes across the years?
+        if (length(unique(unlist(block))) == 1) {
+          # if no change - rewrite HS6plus
+          HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(block)), times = nrow(block))
+        } else {
+          # else keep the family
+          HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i], times = nrow(block))
+        }
+      }
+    }
+
+    PC8_over_time$HS6plus[PC8_over_time$family == 1] <- HS6_temp$HS6plus
+
   }
-
-  fams <- unique(HS6_temp$PC8plus)
 
   if (progress) {
     print(paste0("Work in progress... Part ", mod_partb + 1,  "/" , mod_parte, ": 0%"))
   }
-
-  # check if breaks are needed
-  if (any(idx_breaks)) {
-    for (i in 1:length(fams)) {
-      ### check consistency of each block
-      consistent <- vector(mode = "logical")
-      # nbr of blocks = breaks + 1
-      for (s in 1:(length(breaks[idx_breaks]) + 1)) {
-        if (length(breaks[idx_breaks]) == 1) {
-          # special case for only one break
-          early_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) < breaks[idx_breaks]
-          early_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][early_years]
-          late_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][!early_years]
-          block_1 <- as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], early_years_names])
-          block_2 <- as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], late_years_names])
-          if (length(unique(unlist(block_1))) == 1) {
-            consistent <- c(consistent, TRUE)
-          } else {
-            consistent <- c(consistent, FALSE)
-          }
-          if (length(unique(unlist(block_2))) == 1) {
-            consistent <- c(consistent, TRUE)
-          } else {
-            consistent <- c(consistent, FALSE)
-          }
-          break
-        } else {
-          # derive last block (> last break)
-          if (s == (length(breaks[idx_breaks]) + 1)) {
-            temp_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) >= breaks[idx_breaks][length(breaks[idx_breaks])] #breaks[length(breaks)]
-            temp_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][temp_years]
-            # get all codes in last "time block"
-            assign(paste0("block_", s), as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], temp_years_names]))
-
-          } else if (s == 1) { # First block
-            temp_years <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) < breaks[idx_breaks][s]
-            temp_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][temp_years]
-            # get all codes in one "time block"
-            assign(paste0("block_", s), as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], temp_years_names]))
-
-          } else { # Blocks in between
-            # for all other blocks but the last the following works
-            temp_years1 <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) < breaks[idx_breaks][s]
-            temp_years2 <- as.integer(substr(colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))], start = 5, stop = 8)) >= breaks[idx_breaks][s - 1]# temp_years[temp_years >= breaks[idx_breaks][s - 1]]
-            temp_years <- temp_years1 & temp_years2
-            temp_years_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))][temp_years]
-            # get all codes in one "time block"
-            assign(paste0("block_", s), as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], temp_years_names]))
-          }
-
-          # check if all codes in this block are the same
-          if (length(unique(unlist(eval(parse(text = paste0("block_", s)))))) == 1) {
-            consistent <- c(consistent, TRUE)
-          } else {
-            consistent <- c(consistent, FALSE)
-          }
-        }
-      }
-      ### check if all codes across all blocks remain the same
-      temp_blockvalue <- vector(mode = "character")
-      for (k in 1:(length(breaks[idx_breaks]) + 1)) {
-        temp_blockvalue <- c(temp_blockvalue, eval(parse(text = rep(paste0("block_", k, "[[1]][1]")))))
-      }
-      if (length(unique(temp_blockvalue)) == 1) {
-        equal <- TRUE
-      } else {
-        equal <- FALSE
-      }
-
-      ### check if the blocks are consistent and equal
-      if (all(consistent) & equal) {
-        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(eval(parse(text = "block_1")))),
-                                                             times = nrow(eval(parse(text = "block_1"))))
-      } else if (all(consistent)) {
-        # check if the codes across the blocks differ
-        # but the changes are consistent with the change list
-        # loop over all correspondece lists
-        for (j in 1:sum(idx_breaks)) {
-          # n ... rownbr of related correspondence list where the code of block_j appears
-          # m ... rownbr of related correspondence list where the code of block_(j+1) appears
-          n <- which(eval(parse(text = paste0("block_", j, "[[1]][1]"))) == eval(parse(text = paste0("correspondence_", breaks[idx_breaks][j], "$old"))))
-          m <- which(eval(parse(text = paste0("block_", j + 1, "[[1]][1]"))) == eval(parse(text = paste0("correspondence_", breaks[idx_breaks][j], "$new"))))
-          # the code has to appear only once, otherwise no clear assignment can be done
-          if (length(n) == 1 & length(m) == 1) {
-            if ( m == n) {
-              HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(eval(parse(text = paste0("block_",
-                                                                                                          length(breaks[idx_breaks]) + 1))))),
-                                                                   times = nrow(eval(parse(text = paste0("block_",
-                                                                                                         length(breaks[idx_breaks]) + 1)))))
-            }
-          } else {
-            # if the changes are not consistent with the change list keep the old family
-            HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i],
-                                                                 times = nrow(eval(parse(text = paste0("block_",
-                                                                                                       length(breaks[idx_breaks]) + 1)))))
-          }
-        }
-      } else {
-        # if the changes are not consistent nor equal keep the old family
-        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i],
-                                                             times = nrow(eval(parse(text = paste0("block_",
-                                                                                                   length(breaks[idx_breaks]) + 1)))))
-      }
-      if (progress) {
-        if (i %% 100 == 0) {
-          print(paste0("Work in progress... Part ", mod_partb + 1,  "/" , mod_parte, ": ", round(i / length(fams), 3) * 100, "%"))
-        }
-      }
-    }
-  } else {
-    # case if no changes of HS6 happened in the observed time period
-    year_names <- colnames(HS6_temp)[grep("PC8_", colnames(HS6_temp))]
-    for (i in 1:length(fams)) {
-      block <- as.data.frame(HS6_temp[HS6_temp$PC8plus == fams[i], year_names])
-      # check the code whether it changes across the years?
-      if (length(unique(unlist(block))) == 1) {
-        # if no change - rewrite HS6plus
-        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(unique(unlist(block)), times = nrow(block))
-      } else {
-        # else keep the family
-        HS6_temp$HS6plus[HS6_temp$PC8plus == fams[i]] <- rep(fams[i], times = nrow(block))
-      }
-    }
-  }
-
-  if (progress) {
-    print(paste0("Work in progress... Part ", mod_partb + 1,  "/" , mod_parte, ": 100%"))
-  }
-
-  PC8_over_time$HS6plus[PC8_over_time$family == 1] <- HS6_temp$HS6plus
 
   # get BEC and BEC_agr for HS6plus
   namescol <- c("BEC","BEC_agr")
@@ -429,7 +456,63 @@ harmonize_pc8 <- function(b, e, historymatrix = NULL, harmonize.to = "e",
   PC8_over_time$BEC_agr[idx_na_e] <- NA
   PC8_over_time$SNA_basic_class[idx_na_e] <- NA
 
+  ### redefine family names
+  # find unique families
+  uniq_f <- unique(PC8_over_time$PC8plus[grep("f_", PC8_over_time$PC8plus)])
+  for(i in 1:length(uniq_f)) {
+    # replace each PC8plus family by new name
+    PC8_over_time$PC8plus[which(PC8_over_time$PC8plus == uniq_f[i])] <- paste0("f", i)
+    # replace each HS6plus family by new name
+    PC8_over_time$HS6plus[which(PC8_over_time$HS6plus == uniq_f[i])] <- paste0("f", i)
+  }
+
   PC8_over_time <- PC8_over_time[!duplicated(PC8_over_time),]
+
+  PC8_over_time$SNA <- PC8_over_time$SNA_basic_class
+  PC8_over_time$SNA_basic_class <- NULL
+
+  if (progress) {
+    print(paste0("Work in progress... Part ", mod_partb + 1,  "/" , mod_parte, ": 50%"))
+  }
+
+  ### add flag == 3
+  # flag == 3 indicates that at least one simple change
+  # Two arguments must hold in order to set flag == 3
+  # 1) the code is not associated with a family
+  # 2) the code in the first year (b) has to be different from the last year (e)
+
+  # get all codes not associated with a family
+  flag_rows_f <- grep("f", PC8_over_time$PC8plus, invert = TRUE)
+  # get all rows where first and last year codes differ
+  flag_rows_d <- which(PC8_over_time[[2]] != PC8_over_time[[e - b + 2]])
+  # check for which rows both conditions hold
+  flag_rows <- intersect(flag_rows_f, flag_rows_d)
+  ## only continue if any cases exist
+  if(any(flag_rows)) {
+    # set flag == 3
+    PC8_over_time$flag[flag_rows] <- 3
+
+    ## find flag years
+    flag_cols <- apply(PC8_over_time[flag_rows, 2:(e - b + 2)], 1, FUN = function(x) x[1] != x, simplify = FALSE)
+    # find cols where the code changed
+    flag_cols <- lapply(flag_cols, which)
+    # take smallest element, i.e. first year where the code changed
+    flag_cols <- lapply(flag_cols, min)
+    # transform list into vector
+    flag_cols <- unlist(flag_cols)
+    # add1 one in order to fit again with CN_over_time (first col is plus code)
+    flag_cols <- flag_cols + 1
+    # get colnames and therefore years
+    flag_cols <- as.numeric(substr(colnames(PC8_over_time[flag_cols]), start = 5, stop = 8))
+    ## set flag years
+    PC8_over_time$flagyear[flag_rows] <- flag_cols
+
+  }
+
+
+  if (progress) {
+    print(paste0("Work in progress... Part ", mod_partb + 1,  "/" , mod_parte, ": 100%"))
+  }
 
   return(PC8_over_time)
 }

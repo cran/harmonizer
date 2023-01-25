@@ -18,10 +18,12 @@ get_data_directory <- function(path = TRUE, open_explorer = FALSE, show_data = N
    }
 
    # open explorer
-   if (sum(grep(" ", mod_path)) > 0) {
-      stop("The path contains blanks, therefore no explorer can be opened. Please use the path provided in the console.")
-   } else if (open_explorer == TRUE) {
-      system2("open", mod_path)
+   if (open_explorer == TRUE) {
+     if (sum(grep(" ", mod_path)) > 0) {
+       stop("The path contains blanks, therefore no explorer can be opened. Please use the path provided in the console.")
+     }
+
+     system2("open", mod_path)
    }
 
    # show available data
@@ -40,7 +42,7 @@ get_data_directory <- function(path = TRUE, open_explorer = FALSE, show_data = N
            'CN8', 'HS6', 'PC8' or 'HS6toBEC'.")
    }
 
-   return(org_path)
+   invisible(org_path)
 }
 
 
